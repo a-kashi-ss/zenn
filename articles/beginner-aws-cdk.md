@@ -96,7 +96,7 @@ Resources:
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: 11.0.2.0/24
+      CidrBlock: 10.0.2.0/24
       VpcId: !Ref CFnVPC
       AvailabilityZone: !Select [ 0, !GetAZs ]
       Tags:
