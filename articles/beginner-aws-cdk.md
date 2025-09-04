@@ -1,6 +1,6 @@
 ---
-title: "CloudFormation入門後AWS CDKにトライした話"
-emoji: "🏗"
+title: "AWSネットワーク構築を CloudFormation → CDKで“再現”する手順【初心者向け・IaC入門】"
+emoji: "🌎"
 type: "tech"
 topics: ["aws", "cloudformation", "iac", "CDK", "初心者"]
 published: true
@@ -11,16 +11,42 @@ publication_name: "secondselection"
 
 ## はじめに
 
-本記事では、AWS入門者がIaCに取り組む立場からAWS CDK(Cloud Development Kit)を実際に利用し、その特徴や学習過程で得られた知見を紹介いたします。
-AWS CDKを利用する前にCloudFormationを活用したので、比較のまとめも記載しています。
+私自身約1か月前からAWSを触り始め、GUIからはじまり様々苦戦しながらシンプルなAWS Iacでの構築の基礎ができる現在に至っています。
 
-記事を通じて、CDK活用のイメージを掴んでいただり、Iacの構築方法選択の情報としてご活用いただければ幸いです。
+今回AWS CDK(Cloud Development Kit)を実際に利用し、特徴・作成過程で得た知見をアウトプットします。
+
+以前にCloudFormationで同様の内容の構築をしたので、両者を比較した意見も交えながら、**CDKを使用する利点・再現前にまずきっちり要点を理解しておくべきだったと感じた内容**もご紹介していきます。
+
+:::message
+
+**本記事を通して得られること**
+・AWS CDKをする利用する前に抑えておきたいポイントを知ることができる。
+・初心者でもAWS CDKを使って、AWSの基礎的な環境を構築できる。
+
+:::
 
 ### 今回CDKで作成した構成図
 
 ![画像](/images/begginer-cdk/cdk_architecture.drawio.png)
 
-前回の記事[リンク]の内容をCDKで再現してみました。
+前回の記事の内容をCDKで再現してみました。
+【memoです】あとからリンクを張り付けしたいと思っています。
+
+## CloudFormationとCDKの違いは？
+
+[【初心者向け】AWS CDK 入門！完全ガイド](https://zenn.dev/issy/articles/zenn-cdk-overview)によると、両者の特徴は下記が挙げられています。
+
+| 特徴 | CloudFormation | AWS CDK |
+| --- | --- | --- |
+| 記述形式 | JSONやYAMLのみ | TypeScriptなどプログラミング言語が利用可能 |
+| 定義方法 | すべて明示的に記述する必要がある | CDKライブラリによる自動生成でコード量を最小限に抑えられる |
+| コード量 | 構成が複雑になると増大する | 自動生成や抽象化により抑えられる |
+| 可読性 | コード量増大で低下しやすい | コメントやIDE機能により影響は限定的 |
+| 開発支援 | 基本的になし | IDEでのコード補完などが利用可能 |
+
+タイトルの通り前回CloudFormationで作成したymlファイルを、今回CDKでtypescriptを使いコーディングをして再現したので、VPCスタックを例としてコード量を比較します。
+
+※memoです。ここに比較画像貼りたいと思っています。
 
 ### AWS CDKとは
 
@@ -49,6 +75,8 @@ AWS CDKの核である「コンストラクト」は、1つあるいは複数の
 ## 手順概要
 
 今回行った手順とともに、AWS CDKで使用する主なコマンドについても説明していきます。
+
+AWS CDKの環境構築が完了していることを前提に、作業の流れを下記に記載します。
 
 ### 1. CDKプロジェクトの初期化
 
@@ -87,7 +115,7 @@ CloudFormationテンプレートが生成されたあと、デプロイ時にClo
 
 ## CDKアプリケーションの作成例
 
-以下の例はあくまでサンプルとして作成したものであり、運用上の命名規則や各種ベストプラクティスには沿っておりません。またCloudformationのハンズオン動画のサンプルファイルを模してデータベースのパスワードもハードコーディングを行っており、実運用での検討が必須となる項目も含まれております。そのため**学習や確認を目的とした使用に限って**ご参照ください。
+後述で紹介するファイルのコードは、あくまでサンプルとして作成したものであり、運用上の命名規則や各種ベストプラクティスには沿っておりません。またCloudformationのハンズオン動画のサンプルファイルを模して、データベースのパスワードもハードコーディングを行った点など、実運用での検討が必須となる項目も含まれております。そのため**学習や確認を目的とした使用に限って**ご参照ください。
 
 ### 1. アプリケーションの使用を宣言する
 
@@ -116,7 +144,7 @@ const app = new cdk.App();
 const vpcStack = new VpcStack(app, "VpcStack3");
 ```
 
-vpc-stack.tsにコンストラクトを積み重ねて、VpcStackの詳細を記載していきます。
+vpc-stack.tsにスタックの詳細を記載していきます。
 
 ```ts:lib/vpc-stack.ts
 import * as cdk from "aws-cdk-lib";
@@ -174,7 +202,7 @@ const rdsStack = new RdsStack(app, "RdsStack3", {
 
 ```
 
-rds-stack.tsに詳細を追記します。
+rds-stack.tsにスタックの詳細を追記します。
 
 ```ts:lib/rds-stack.ts
 
@@ -224,7 +252,7 @@ export class RdsStack extends cdk.Stack {
 
 ![画像](/images/begginer-cdk/cdk_architecture_ec2.drawio.png)
 
-tmp.tsにEC2を追記します。
+tmp.tsにEC2スタックを追記します。
 
 ```ts:bin/tmp.ts
 import * as cdk from 'aws-cdk-lib';
@@ -251,7 +279,7 @@ const ec2Stack = new Ec2Stack(app, "Ec2Stack3", {
 
 ```
 
-ec2-stack.tsに詳細を追記します。
+ec2-stack.tsにスタックの詳細を追記します。
 
 ```ts:lib/ec2-stack.ts
 import * as cdk from "aws-cdk-lib";
@@ -350,7 +378,7 @@ const elbStack = new ElbStack(app, "ElbStack3", {
 
 ```
 
-elb-stack.tsを記載します。
+elb-stack.tsをスタックの詳細を記載します。
 
 ```ts:lib/elb-stack.ts
 import * as cdk from 'aws-cdk-lib';
@@ -414,52 +442,21 @@ export class ElbStack extends cdk.Stack {
 
 ```
 
-## CDKとCloudFormationの違いは？
-
-まず圧倒的に差を感じたのは、**コード量**です。
-今回作成したスタックはCloudFormationのテンプレートを再現し記述したので、比較していただきたいです。
-
-A vs B
-
-CloudFormationの特徴をまず3点挙げます。
-
-- 記述形式がJSONもしくはYAMLのみ
-- すべての定義を明示的に記載が必要
-- 記述量は構成の複雑度に比例する。
-
-一方CDKのメリットも3点挙げます。
-
-- 記述形式はプログラミング言語(TypeScript/Python)を選択できる。
-- CDKライブラリの恩恵で、自動生成が利用可能なため、コード記述量の簡潔化が可能。
-- IDEの機能でコード補完の利用が可能。
-
-@[card](https://www.cloudsolution.tokai-com.co.jp/white-paper/2023/0720-403.html#anc-02)
-
 ## さいごに
 
-最後までご覧いただきありがとうございました。
+あくまで個人の意見ですが、今回AWS CDKで環境構築をしてみて、CloudFormationより難しいけど楽しいなあと感じました。
+
+CloudFormationは必要な項目をymlファイルで必要なパラメータを設定していく要素が多かったです。
+一方でCDKはコンストラクトの機能を選び、テンプレートを自動生成する機能の恩恵を使うことが本当に正しいか見極めたり確認しながら、組み上げていく感覚を持てる点に面白さがありました。
+（AWSにほんの少し慣れてきて、小さな成功体験が増えたことで目を向けられることの幅が少しずつ広がっていることも、楽しさに比例している可能性も否めません）
+
+とはいえ、AWSさんが出しているベストプラクティスにはまだまだ程遠いですし、前述した要点も抑えられていなかったので、これからもっと精進していきます。
+
+今回の記事が似たような立場の人が良い経験を積むことに繋がっていれば幸いです。
+最後までご覧いただき、ありがとうございました。
 
 ## 参考
 
 @[card](https://speakerdeck.com/konokenj/cdk-best-practice-2024)
 
 @[card](https://pages.awscloud.com/rs/112-TZM-766/images/AWS-Black-Belt_2023_AWS-CDK-Basic-1-Overview_0731_v1.pdf)
-
-=======================================================================================
-<!-- 以下ボツ！ -->
-
-@[card](https://www.cloudsolution.tokai-com.co.jp/white-paper/2023/0720-403.html#anc-02)
-
-参照: [builders.flash](https://aws.amazon.com/jp/builders-flash/202309/awsgeek-aws-cdk/)
-
-> 「コンストラクト」は、抽象度や再利用性に応じて、L1、L2、L3 という 3 つのレベルに分類されます。
-> L1 コンストラクトは CloudFormation リソースそのものを表し、L2 コンストラクトは通常 AWS のリソースと 1:1 で対応します。
-
-L1のコンストラクトを書き続けなくても、L2コンストラクトを使用することによって、コード数を減らしたり自動設定に頼った項目もあります。
-仕様したいリソースや環境によって活用方法は異なるので、どちらを採用するかどのように判断するかは後述していきます。
-
-この階層の使い分けをすることで、CloudFormationに比べて記述量を減らすこともできました。
-L1はCloudFormationに1:1の関係なので、L1を組み立てて記述も可能ですが、L2を使用することによってIaCの自動化の恩恵を受けることができました。
-
-必要となるCloudFormationの機能に対して、自動で必要リソースを追加で作成してくれたりとL2はとても便利でした。
-ただし、自動で勝手に作られてしまうということもあるので、CDK diffを叩いたときにどんなリソースが作成されて必要なのかを確認する必要性があります。
