@@ -7,7 +7,6 @@ published: true
 published_at: 2025-09-15 05:00
 publication_name: "secondselection"
 ---
-test
 
 ## はじめに
 
