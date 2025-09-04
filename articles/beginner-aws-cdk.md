@@ -2,9 +2,9 @@
 title: "AWSネットワーク構築を CloudFormation → CDKで“再現”する手順【初心者向け・IaC入門】"
 emoji: "🌎"
 type: "tech"
-topics: ["aws", "cloudformation", "iac", "CDK", "初心者"]
+topics: ["aws", "CDK", "cloudformation", "初心者",  "#zennfes2025infra"]
 published: true
-published_at: 2025-09-08 05:00
+published_at: 2025-09-15 05:00
 publication_name: "secondselection"
 ---
 
