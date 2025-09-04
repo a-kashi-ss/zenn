@@ -11,28 +11,32 @@ publication_name: "secondselection"
 
 ## はじめに
 
-私自身約1か月前からAWSを触り始め、GUIからはじまり様々苦戦しながらシンプルなAWS Iacでの構築の基礎ができる現在に至っています。
+私自身約1か月前からAWSを触り始め、GUIからはじめAWS Iacでの構築の基礎はできるようになりました。
+今回はAWS CDK(Cloud Development Kit)を実際に利用したので、構築する過程で得た知識をアウトプットします。
 
-今回AWS CDK(Cloud Development Kit)を実際に利用し、特徴・作成過程で得た知見をアウトプットします。
-
-以前にCloudFormationで同様の内容の構築をしたので、両者を比較した意見も交えながら、**CDKを使用する利点・再現前にまずきっちり要点を理解しておくべきだったと感じた内容**もご紹介していきます。
+以前にCloudFormationで同様の内容の構築をしたため比較も交えながら、**AWS CDKを使用するメリット・使用前に抑えておきたかったポイント**もご紹介していきます。
 
 :::message
 
 **本記事を通して得られること**
-・AWS CDKをする利用する前に抑えておきたいポイントを知ることができる。
+・AWS CDKを使用するうえで抑えておきたいポイントを知ることができる。
 ・初心者でもAWS CDKを使って、AWSの基礎的な環境を構築できる。
 
 :::
 
-### 今回CDKで作成した構成図
+### 今回AWS CDKで作成した構成図
 
+前回CloudFormationで作成した環境を、今回CDKで再現してみました。
+
+VPC内にパブリックサブネットとプライベートサブネットを配置し、パブリックサブネットには外部公開用のEC2、プライベートサブネットにはDBを設置します。外部からのアクセスはELBを経由してEC2へ振り分けられる構成です。
 ![画像](/images/begginer-cdk/cdk_architecture.drawio.png)
 
-前回の記事の内容をCDKで再現してみました。
-【memoです】あとからリンクを張り付けしたいと思っています。
+CloudFormationについて確認したい方やネットワークの基礎について、前回作成した記事には記載してますので、必要に応じて下記はご参照ください。
+@[card](https://zenn.dev/secondselection/articles/beginner-aws-cfn)
 
-## CloudFormationとCDKの違いは？
+## CloudFormationとAWS CDKの違いは？
+
+AWS CDKの詳しい説明の前に、まずはCloudFormationと比較しながら概要に触れていきます。
 
 [【初心者向け】AWS CDK 入門！完全ガイド](https://zenn.dev/issy/articles/zenn-cdk-overview)によると、両者の特徴は下記が挙げられています。
 
@@ -44,25 +48,156 @@ publication_name: "secondselection"
 | 可読性 | コード量増大で低下しやすい | コメントやIDE機能により影響は限定的 |
 | 開発支援 | 基本的になし | IDEでのコード補完などが利用可能 |
 
-タイトルの通り前回CloudFormationで作成したymlファイルを、今回CDKでtypescriptを使いコーディングをして再現したので、VPCスタックを例としてコード量を比較します。
+上記の**コード量**に関する記述は私も使用して実感できた点なので、具体例としてVPCスタックを作成するファイルの内容を確認します。
 
-※memoです。ここに比較画像貼りたいと思っています。
+前回CloudFormationで作成したymlファイルと、今回AWS CDKで作成したコード量を比較しました。
+**CloudFormationでは128行で構築した内容が、AWS CDKで書くと47行で済み、記載量を半分以上削減できました。**
+
+:::details CloudFromationで作成したymlファイルの内容です。
+
+```yml
+AWSTemplateFormatVersion: 2010-09-09
+Description: Hands-on template for VPC
+
+Resources:
+  CFnVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      InstanceTenancy: default
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: handson-cfn
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/24
+      VpcId: !Ref CFnVPC
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet1
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      VpcId: !Ref CFnVPC
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet2
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 11.0.2.0/24
+      VpcId: !Ref CFnVPC
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet1
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.3.0/24
+      VpcId: !Ref CFnVPC
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet2
+
+  CFnVPCIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags:
+        - Key: Name
+          Value: handson-cfn
+
+  CFnVPCIGWAttach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref CFnVPCIGW
+      VpcId: !Ref CFnVPC
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref CFnVPC
+      Tags:
+        - Key: Name
+          Value: Public Route
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: CFnVPCIGW
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref CFnVPCIGW
+
+  PublicSubnet1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet2Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+Outputs:
+  VPCID:
+    Description: VPC ID
+    Value: !Ref CFnVPC
+    Export:
+      Name: !Sub ${AWS::StackName}-VPCID
+
+  PublicSubnet1:
+    Description: PublicSubnet1
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnet1
+
+  PublicSubnet2:
+    Description: PublicSubnet2
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnet2
+
+  PrivateSubnet1:
+    Description: PrivateSubnet1
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnet1
+
+  PrivateSubnet2:
+    Description: PrivateSubnet2
+    Value: !Ref PrivateSubnet2
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnet2
+
+
+```
+
+:::
+
+なぜコード量が削減できる理由も把握していただけるよう、このあとAWS CDKの特徴・仕組みをお伝えしていきます。
 
 ### AWS CDKとは
 
 AWS CDKは、TypeScript、Pythonなどのプログラミング言語で、AWSリソースを定義できるオープンソースフレームワークです。
 
 >![画像](/images/begginer-cdk/cdk_graphicRecording.drawio.png)*[参照元:https://aws.amazon.com/jp/builders-flash/202309/awsgeek-aws-cdk/](https://aws.amazon.com/jp/builders-flash/202309/awsgeek-aws-cdk/)*
-:::details 📝上記参照元のAWS builders.flash「使い慣れたプログラミング言語でクラウド環境を構築 ! AWS CDKをグラレコで解説」のCDK説明内容(一部抜粋)。
-
-[AWS builders.flash 使い慣れたプログラミング言語でクラウド環境を構築 ! AWS CDK をグラレコで解説](https://aws.amazon.com/jp/builders-flash/202309/awsgeek-aws-cdk/)では下記の説明があります。
-
-> - AWS CDKとは、開発者が自分の得意なプログラミング言語を使用してインフラを定義できるフレームワークです。
-> - AWS CDK の構成要素は主に「アプリケーション」「スタック」「コンストラクト」の 3つのレイヤーに分けられます。
-> - AWS CDK の中心的な概念は「コンストラクト」です。コンストラクトには 1 つまたは複数の AWS リソースを含めることができます。また、コンストラクトには別のコンストラクトを自由に含めることができるため、任意の構成をパッケージングして再利用できます。コンストラクトの使用により、共通の設定やベストプラクティスを簡単に共有でき、複雑なクラウド環境であっても効率的に構築を行えます。
->
-
-:::
+> こちらの参照元のサイトが一番概要を掴みやすかったです。
 
 ### AWS CDKの構成要素について
 
@@ -71,6 +206,11 @@ AWS CDKは、TypeScript、Pythonなどのプログラミング言語で、AWSリ
 AWS CDKでは**アプリケーションがスタックを内包し、スタックの中でコンストラクトを組み合わせてインフラを構築していく**という階層構造を持っています。
 
 AWS CDKの核である「コンストラクト」は、1つあるいは複数のAWSリソースをまとめた部品です。このコンストラクトのまとまりが「スタック」で、デプロイ可能な最小単位です。そして、複数スタックの依存関係を定義する要素が「アプリケーション」です。
+
+コンストラクトにはレベルがあり、詳しい説明は下記のように書かれていました。
+![画像](/images/begginer-cdk/cdk_constract.drawio.png)*[参照元:https://blog.usize-tech.com/aws-cdk-construct/](https://blog.usize-tech.com/aws-cdk-construct/)*
+
+私は最初コンストラクトの優位性が理解しきれておらず、危うくAWS CDKの恩恵を享受しながらコードを書けていませんでした。コンストラクトの種類を理解したうえで、選定することでコード量の削減もできるようになったので、冒頭にお伝えしたポイントは**コンストラクトを使いこなすこと**ではないかと考えています。
 
 ## 手順概要
 
@@ -115,7 +255,7 @@ CloudFormationテンプレートが生成されたあと、デプロイ時にClo
 
 ## CDKアプリケーションの作成例
 
-後述で紹介するファイルのコードは、あくまでサンプルとして作成したものであり、運用上の命名規則や各種ベストプラクティスには沿っておりません。またCloudformationのハンズオン動画のサンプルファイルを模して、データベースのパスワードもハードコーディングを行った点など、実運用での検討が必須となる項目も含まれております。そのため**学習や確認を目的とした使用に限って**ご参照ください。
+※　以下に記載しているコードは、あくまでサンプルとしてテスト作成したものであり、運用上の命名規則や各種ベストプラクティスには沿っておりません。データベースのパスワードもハードコーディングを行っている点など、実運用での検討が必要な項目も含まれております。そのため**学習や確認を目的とした使用に限って**ご参照ください。
 
 ### 1. アプリケーションの使用を宣言する
 
@@ -125,7 +265,6 @@ CloudFormationテンプレートが生成されたあと、デプロイ時にClo
 import * as cdk from 'aws-cdk-lib';
 
 const app = new cdk.App();
-
 ```
 
 ### 2. VPCスタックを作成する
@@ -145,6 +284,7 @@ const vpcStack = new VpcStack(app, "VpcStack3");
 ```
 
 vpc-stack.tsにスタックの詳細を記載していきます。
+記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
 
 ```ts:lib/vpc-stack.ts
 import * as cdk from "aws-cdk-lib";
@@ -159,7 +299,7 @@ export class VpcStack extends cdk.Stack {
 
         // VPC
         this.vpc = new ec2.Vpc(this, "VpcStack3", {
-            ipAddresses: ec2.IpAddresses.cidr("13.0.0.0/16"),
+            ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
             maxAzs: 2,
             natGateways: 0, 
             subnetConfiguration: [
@@ -177,8 +317,15 @@ export class VpcStack extends cdk.Stack {
         });
     }
 }
-
 ```
+
+#### 💡コンストラクトがポイントということを前述したので、ここで少しだけ深掘りします
+
+以下の画像はVpcStackのデプロイ前にcdk diffコマンドで内容を確認時のキャプチャーです。
+![画像](/images/begginer-cdk/cdk_constract_diff.drawio.png)
+
+抽象度の低いコンストラクトを使用した際は、黄色枠線のみが更新される形だったので、他のコンストラクターの追記をしなければスタックが構築できないという状況に遭遇しました。
+そこで、コンストラクタを変更することで自動作成の恩恵を受けることができ、追記も不要となり、一気にリソースの設定も進み利便性を感じることができました。
 
 ### 3. RDSスタックを作成する
 
@@ -199,10 +346,10 @@ const vpcStack = new VpcStack(app, "VpcStack3");
 const rdsStack = new RdsStack(app, "RdsStack3", {
     vpc: vpcStack.vpc,
 });
-
 ```
 
 rds-stack.tsにスタックの詳細を追記します。
+記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
 
 ```ts:lib/rds-stack.ts
 
@@ -224,7 +371,7 @@ export class RdsStack extends cdk.Stack {
             description: 'Allow MySQL access from within VPC',
             allowAllOutbound: true,
         });
-        sg.addIngressRule(ec2.Peer.ipv4("13.0.0.0/16"), ec2.Port.tcp(3306), "MySQL access");
+        sg.addIngressRule(ec2.Peer.ipv4("10.0.0.0/16"), ec2.Port.tcp(3306), "MySQL access");
 
         new rds.DatabaseInstance(this, "AppRds", {
             vpc: props.vpc,
@@ -245,14 +392,13 @@ export class RdsStack extends cdk.Stack {
         });
     }
 }
-
 ```
 
 ### 4. EC2スタックを作成する
 
 ![画像](/images/begginer-cdk/cdk_architecture_ec2.drawio.png)
 
-tmp.tsにEC2スタックを追記します。
+tmp.tsにEC2スタックの詳細を追記します。
 
 ```ts:bin/tmp.ts
 import * as cdk from 'aws-cdk-lib';
@@ -275,11 +421,10 @@ const rdsStack = new RdsStack(app, "RdsStack3", {
 const ec2Stack = new Ec2Stack(app, "Ec2Stack3", {
     vpc: vpcStack.vpc,
 });
-
-
 ```
 
 ec2-stack.tsにスタックの詳細を追記します。
+記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
 
 ```ts:lib/ec2-stack.ts
 import * as cdk from "aws-cdk-lib";
@@ -375,10 +520,10 @@ const elbStack = new ElbStack(app, "ElbStack3", {
     vpc: vpcStack.vpc,
     ec2Instance: ec2Stack.instance,
 });
-
 ```
 
-elb-stack.tsをスタックの詳細を記載します。
+elb-stack.tsにスタックの詳細を記載します。
+記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
 
 ```ts:lib/elb-stack.ts
 import * as cdk from 'aws-cdk-lib';
@@ -444,15 +589,12 @@ export class ElbStack extends cdk.Stack {
 
 ## さいごに
 
-あくまで個人の意見ですが、今回AWS CDKで環境構築をしてみて、CloudFormationより難しいけど楽しいなあと感じました。
+あくまで個人の意見ですが、今回AWS CDKで環境構築をしてみて、CloudFormationより難しいけど楽しいし便利だなあと感じています。
 
-CloudFormationは必要な項目をymlファイルで必要なパラメータを設定していく要素が多かったです。
-一方でCDKはコンストラクトの機能を選び、テンプレートを自動生成する機能の恩恵を使うことが本当に正しいか見極めたり確認しながら、組み上げていく感覚を持てる点に面白さがありました。
-（AWSにほんの少し慣れてきて、小さな成功体験が増えたことで目を向けられることの幅が少しずつ広がっていることも、楽しさに比例している可能性も否めません）
+CloudFormationは必要な項目をymlファイルで必要なパラメータをすべて記載し、アップロードを行う流れでした。一方でAWS CDKはどのコンストラクトを使用するか選び、テンプレートが自動生成される恩恵を使いながらCLI上で確認を挟みながら組み立てていける点に面白さがありました。
+（AWSにほんの少し慣れてきて、小さな成功体験が増えたことで目を向けられることの幅が少しずつ広がっていることも、楽しさに比例している可能性は否めません）
 
-とはいえ、AWSさんが出しているベストプラクティスにはまだまだ程遠いですし、前述した要点も抑えられていなかったので、これからもっと精進していきます。
-
-今回の記事が似たような立場の人が良い経験を積むことに繋がっていれば幸いです。
+とはいえ、AWSさんが出しているベストプラクティスにはまだまだ程遠いですし、ポイントを抑えられていない状態で手を動かしてしまったり反省・課題は山積みなので、これからもっと精進していきます。今回の記事が似たような立場の人にとって有益な情報となっていれば幸いです。
 最後までご覧いただき、ありがとうございました。
 
 ## 参考
