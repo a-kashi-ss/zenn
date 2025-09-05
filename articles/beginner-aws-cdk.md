@@ -388,7 +388,7 @@ export class RdsStack extends cdk.Stack {
         });
         sg.addIngressRule(ec2.Peer.ipv4("10.0.0.0/16"), ec2.Port.tcp(3306), "MySQL access");
 
-        new rds.DatabaseInstance(this, "AppRds", {
+        const rds = new rds.DatabaseInstance(this, "AppRds", {
             vpc: props.vpc,
             engine: rds.DatabaseInstanceEngine.mysql({
                 version: rds.MysqlEngineVersion.VER_8_0,
@@ -595,7 +595,7 @@ export class ElbStack extends cdk.Stack {
             defaultTargetGroups: [targetGroup],
         });
 
-        new cdk.CfnOutput(this, "ElbStack3-FrontLBEndpoint", {
+        const FrontLBEndpoint =new cdk.CfnOutput(this, "ElbStack3-FrontLBEndpoint", {
             value: alb.loadBalancerDnsName,
             exportName: "ElbStack3-elb-Endpoint", 
         });
