@@ -311,12 +311,12 @@ export class VpcStack extends cdk.Stack {
             natGateways: 0, 
             subnetConfiguration: [
                 {
-                    name: "VpcStack3-PublicSubnet",
+                    name: `${id}-PublicSubnet`,
                     subnetType: ec2.SubnetType.PUBLIC,
                     cidrMask: 24,
                 },
                 {
-                    name: "VpcStack3-PrivateSubnet",
+                    name: `${id}-PrivateSubnet`,
                     subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
                     cidrMask: 24,
                 },
@@ -597,7 +597,7 @@ export class ElbStack extends cdk.Stack {
 
         const FrontLBEndpoint =new cdk.CfnOutput(this, "ElbStack3-FrontLBEndpoint", {
             value: alb.loadBalancerDnsName,
-            exportName: "ElbStack3-elb-Endpoint", 
+            exportName: `${id}-Endpoint`, 
         });
     }
 }
