@@ -25,7 +25,7 @@ publication_name: "secondselection"
 
 ### 今回AWS CDKで作成した構成図
 
-前回CloudFormationで作成した環境を、今回CDKで再現してみました。
+[前回CloudFormationで作成した環境](https://zenn.dev/secondselection/articles/beginner-aws-cfn)を、今回CDKで再現してみました。
 
 VPC内にパブリックサブネットとプライベートサブネットを配置し、パブリックサブネットには外部公開用のEC2、プライベートサブネットにはDBを設置します。外部からのアクセスはELBを経由してEC2へ振り分けられる構成です。
 ![画像](/images/begginer-cdk/cdk_architecture.drawio.png)
