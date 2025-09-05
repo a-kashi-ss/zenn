@@ -18,7 +18,7 @@ publication_name: "secondselection"
 :::message
 
 **本記事を通して得られること**
-・AWS CDKを使用するうえで抑えておきたいポイントを知ることができる。
+・AWS CDKを使用するうえで押さえておきたいポイントを知ることができる。
 ・初心者でもAWS CDKを使って、AWSの基礎的な環境を構築できる。
 
 :::
