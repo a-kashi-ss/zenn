@@ -276,7 +276,7 @@ import { VpcStack } from "../lib/vpc-stack"; // 追加
 const app = new cdk.App();
 
 // 追加:VPC
-const vpcStack = new VpcStack(app, "VpcStack3");
+const vpcStack = new VpcStack(app, "SamplePjVpcStack");
 ```
 
 :::message alert
@@ -303,7 +303,7 @@ export class VpcStack extends cdk.Stack {
         super(scope, id, props); 
 
         // VPC
-        this.vpc = new ec2.Vpc(this, "VpcStack3", {
+        this.vpc = new ec2.Vpc(this, "SamplePjVpcStack", {
             ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
             maxAzs: 2,
             natGateways: 0, 
@@ -355,10 +355,10 @@ import { RdsStack } from "../lib/rds-stack";// 追記
 const app = new cdk.App();
 
 // VPC
-const vpcStack = new VpcStack(app, "VpcStack3");
+const vpcStack = new VpcStack(app, "SamplePjVpcStack");
 
 // 追記:RDS
-const rdsStack = new RdsStack(app, "RdsStack3", {
+const rdsStack = new RdsStack(app, "SamplePjRdsStack", {
     vpc: vpcStack.vpc,
 });
 ```
@@ -425,15 +425,15 @@ import { Ec2Stack } from "../lib/ec2-stack";// 追記
 const app = new cdk.App();
 
 // VPC
-const vpcStack = new VpcStack(app, "VpcStack3");
+const vpcStack = new VpcStack(app, "SamplePjVpcStack");
 
 // RDS
-const rdsStack = new RdsStack(app, "RdsStack3", {
+const rdsStack = new RdsStack(app, "SamplePjRdsStack", {
     vpc: vpcStack.vpc,
 });
 
 // 追記:EC2
-const ec2Stack = new Ec2Stack(app, "Ec2Stack3", {
+const ec2Stack = new Ec2Stack(app, "SamplePjEc2Stack", {
     vpc: vpcStack.vpc,
 });
 ```
@@ -518,20 +518,20 @@ import { ElbStack } from "../lib/elb-stack";// 追記:ELB
 const app = new cdk.App();
 
 // VPC
-const vpcStack = new VpcStack(app, "VpcStack3");
+const vpcStack = new VpcStack(app, "SamplePjVpcStack");
 
 // RDS
-const rdsStack = new RdsStack(app, "RdsStack3", {
+const rdsStack = new RdsStack(app, "SamplePjRdsStack", {
     vpc: vpcStack.vpc,
 });
 
 // EC2
-const ec2Stack = new Ec2Stack(app, "Ec2Stack3", {
+const ec2Stack = new Ec2Stack(app, "SamplePjEc2Stack", {
     vpc: vpcStack.vpc,
 });
 
 // 追記:ELB 
-const elbStack = new ElbStack(app, "ElbStack3", {
+const elbStack = new ElbStack(app, "SamplePjElbStack", {
     vpc: vpcStack.vpc,
     ec2Instance: ec2Stack.instance,
 });
