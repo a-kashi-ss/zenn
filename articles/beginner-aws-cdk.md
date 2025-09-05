@@ -283,11 +283,12 @@ const vpcStack = new VpcStack(app, "SamplePjVpcStack");
 
 #### 論理IDについて
 
-コンストラクタの第2引数に指定する文字列をconstructIDといいます。
+コンストラクトの第2引数に指定する文字列をconstructIDといいます。
 `const vpcStack = new VpcStack(app, "SamplePjVpcStack");`の場合、`SamplePjVpcStack`
 
-同一のAWSアカウント内で作成したリソースに対しては、このconstructIDが重複する状態でデプロイを仮に行った場合、置き換えが発生します。
-命名規則が設けられていないケースなどでは、既存のリソースを上書きすることによってデータを削除するリスクもあるので、後述する`cdk diffコマンド`の活用が重要です。
+同一のAWSアカウント内で保持するコンストラクトはそれぞれ一意のconstructIDを持ちます。
+そのためconstructIDが重複する状態で、もしデプロイを行った場合、置き換えが発生します。
+命名規則が設けられていないケースなどであれば起こりうる可能性も高くなり、既存のリソースを上書きすることによって不具合が起きるリスクも高いので、後述する`cdk diffコマンド`の活用が重要です。
 
 :::
 
