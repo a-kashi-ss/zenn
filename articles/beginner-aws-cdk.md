@@ -28,7 +28,7 @@ publication_name: "secondselection"
 [前回CloudFormationで作成した環境](https://zenn.dev/secondselection/articles/beginner-aws-cfn)を、今回CDKで再現してみました。
 
 VPC内にパブリックサブネットとプライベートサブネットを配置し、パブリックサブネットには外部公開用のEC2、プライベートサブネットにはDBを設置します。外部からのアクセスはELBを経由してEC2へ振り分けられる構成です。
-![画像](/images/begginer-cdk/cdk_architecture.drawio.png)
+![画像](/images/begginer-aws-cfn/handson_cfn.drawio.png)
 
 CloudFormationについて確認したい方やネットワークの基礎について、前回作成した記事に記載してますので、必要に応じて下記はご参照ください。
 @[card](https://zenn.dev/secondselection/articles/beginner-aws-cfn)
@@ -268,7 +268,7 @@ const app = new cdk.App();
 
 - 次にVPCスタックの使用を宣言します。
 
-![画像](/images/begginer-cdk/cdk_architecture_vpc.drawio.png)
+![画像](/images/begginer-aws-cfn/handson_cfn1_vpc.drawio.png)
 
 ```ts:bin/tmp.ts
 import * as cdk from 'aws-cdk-lib';
@@ -326,7 +326,7 @@ export class VpcStack extends cdk.Stack {
 
 ### 3. RDSスタックを作成する
 
-![画像](/images/begginer-cdk/cdk_architecture_rds.drawio.png)
+![画像](/images/begginer-cdk/handson_cfn2_rds.drawio.png)
 
 ```ts:bin/tmp.ts
 import * as cdk from 'aws-cdk-lib';
@@ -393,7 +393,7 @@ export class RdsStack extends cdk.Stack {
 
 ### 4. EC2スタックを作成する
 
-![画像](/images/begginer-cdk/cdk_architecture_ec2.drawio.png)
+![画像](/images/begginer-cdk/handson_cfn3_ec2.drawio.png)
 
 tmp.tsにEC2スタックの詳細を追記します。
 
@@ -485,7 +485,7 @@ export class Ec2Stack extends cdk.Stack {
 
 ### 5. ELBスタックを作成する
 
-![画像](/images/begginer-cdk/cdk_architecture_elb.drawio.png)
+![画像](/images/begginer-aws-cfn/handson_cfn4_elb.drawio.png)
 
 tmp.tsにELBスタックを追記します。
 
