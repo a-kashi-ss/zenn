@@ -10,7 +10,7 @@ publication_name: "secondselection"
 
 ## はじめに
 
-私自身約1か月前からAWSを触り始め、GUIからはじめAWS Iacでの構築の基礎はできるようになりました。
+私自身約1か月前からAWSを触り始め、GUIからはじめAWS IaCでの構築の基礎はできるようになりました。
 今回はAWS CDK(Cloud Development Kit)を実際に利用したので、構築する過程で得た知識をアウトプットします。
 
 以前にCloudFormationで同様の内容の構築をしたため比較も交えながら、**AWS CDKを使用するメリット・使用前に抑えておきたかったポイント**もご紹介していきます。
