@@ -216,6 +216,14 @@ AWS CDKの核である「コンストラクト」は、1つあるいは複数の
 
 AWS CDKの環境構築が完了していることを前提に、作業の流れを下記に記載します。
 
+:::message alert
+
+#### 注意事項
+
+以下に記載しているコードは、あくまでサンプルとしてテスト作成したものであり、運用上の命名規則や各種ベストプラクティスには沿っておりません。データベースのパスワードもハードコーディングを行っている点など、実運用での検討が必要な項目も含まれております。そのため**学習や確認を目的とした使用に限って**ご参照ください。
+
+:::
+
 ### 1. CDKプロジェクトの初期化
 
 任意のフォルダ内で、必要なファイルをセットアップします。
@@ -225,36 +233,7 @@ AWS CDKの環境構築が完了していることを前提に、作業の流れ�
 
 ※ 対象アカウント・リージョンにつき、初回1回のみ`cdk bootstrap`コマンドを実行してCDK環境を初期化が必要。
 
-### 2. CDKアプリケーションの作成
-
-初期化したプロジェクトでアプリケーションをコーディングします。
-
-- `cdk diff {スタック名}`で差分を確認し、必要に応じて修正していきます。
-
-![画像](/images/begginer-cdk/cdk_diff.drawio.png)*[参照元:https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=18](https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=18)*
-
-:::message alert
-
-#### 論理IDの変更にはご注意ください
-
-コンストラクタの第2引数に指定する文字列をconstructIDといいます。
-このconstructIDを変更したり、Constructを別の階層に移動すると論理IDが変わり、置き換えが発生します。
-
-:::
-
-### 3. AWSへのデプロイ
-
-- スタックが完成すれば`cdk deploy {スタック名}`コマンドでデプロイします。
-
-CloudFormationテンプレートが生成されたあと、デプロイ時にCloudFormationサービスへ渡されることで、AWSリソースが構築されます。
-
-![画像](/images/begginer-cdk/cdk_deploy.drawio.png)*[参照元:https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=8](https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=8)*
-
-## CDKアプリケーションの作成例
-
-※　以下に記載しているコードは、あくまでサンプルとしてテスト作成したものであり、運用上の命名規則や各種ベストプラクティスには沿っておりません。データベースのパスワードもハードコーディングを行っている点など、実運用での検討が必要な項目も含まれております。そのため**学習や確認を目的とした使用に限って**ご参照ください。
-
-### 1. アプリケーションの使用を宣言する
+### 2. アプリケーションの使用を宣言する
 
 まずはじめにbinディレクトリのtmp.tsで「アプリケーション」の使用を宣言します。
 
@@ -264,7 +243,7 @@ import * as cdk from 'aws-cdk-lib';
 const app = new cdk.App();
 ```
 
-### 2. VPCスタックを作成する
+### 3. VPCスタックを作成する
 
 - 次にVPCスタックの使用を宣言します。
 
@@ -279,6 +258,15 @@ const app = new cdk.App();
 // 追加:VPC
 const vpcStack = new VpcStack(app, "VpcStack3");
 ```
+
+:::message alert
+
+#### 論理IDの変更にはご注意ください
+
+コンストラクタの第2引数に指定する文字列をconstructIDといいます。
+このconstructIDを変更したり、Constructを別の階層に移動すると論理IDが変わり、置き換えが発生します。
+
+:::
 
 vpc-stack.tsにスタックの詳細を記載していきます。
 記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
@@ -316,6 +304,10 @@ export class VpcStack extends cdk.Stack {
 }
 ```
 
+- `cdk diff {スタック名}`で差分を確認し、必要に応じて修正していきます。
+
+![画像](/images/begginer-cdk/cdk_diff.drawio.png)*[参照元:https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=18](https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=18)*
+
 #### 💡コンストラクトがポイントということを前述したので、ここで少しだけ深掘りします
 
 以下の画像はVpcStackのデプロイ前にcdk diffコマンドで内容を確認時のキャプチャーです。
@@ -324,7 +316,13 @@ export class VpcStack extends cdk.Stack {
 抽象度の低いコンストラクトを使用した際は、黄色枠線のみが更新される形だったので、他のコンストラクターの追記をしなければスタックが構築できないという状況に遭遇しました。
 そこで、コンストラクタを変更することで自動作成の恩恵を受けることができ、追記も不要となり、一気にリソースの設定も進み利便性を感じることができました。
 
-### 3. RDSスタックを作成する
+- スタックが完成すれば`cdk deploy {スタック名}`コマンドでデプロイします。
+
+CloudFormationテンプレートが生成されたあと、デプロイ時にCloudFormationサービスへ渡されることで、AWSリソースが構築されます。
+
+![画像](/images/begginer-cdk/cdk_deploy.drawio.png)*[参照元:https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=8](https://speakerdeck.com/konokenj/cdk-best-practice-2024?slide=8)*
+
+### 4. RDSスタックを作成する
 
 ![画像](/images/begginer-cdk/handson_cfn2_rds.drawio.png)
 
@@ -391,7 +389,7 @@ export class RdsStack extends cdk.Stack {
 }
 ```
 
-### 4. EC2スタックを作成する
+### 5. EC2スタックを作成する
 
 ![画像](/images/begginer-cdk/handson_cfn3_ec2.drawio.png)
 
@@ -483,7 +481,7 @@ export class Ec2Stack extends cdk.Stack {
 }
 ```
 
-### 5. ELBスタックを作成する
+### 6. ELBスタックを作成する
 
 ![画像](/images/begginer-aws-cfn/handson_cfn4_elb.drawio.png)
 
