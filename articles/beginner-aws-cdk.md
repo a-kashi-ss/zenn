@@ -305,7 +305,7 @@ export class VpcStack extends cdk.Stack {
         super(scope, id, props); 
 
         // VPC
-        this.vpc = new ec2.Vpc(this, "SamplePjVpcStack", {
+        this.vpc = new ec2.Vpc(this, "vpc", {
             ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
             maxAzs: 2,
             natGateways: 0, 
@@ -558,7 +558,7 @@ export class ElbStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: ElbStackProps) {
         super(scope, id, props);
 
-        const lbSecurityGroup = new ec2.SecurityGroup(this, 'elbSg', {
+        const lbSecurityGroup = new ec2.SecurityGroup(this, "elbSg", {
             vpc: props.vpc,
             description: 'Allow HTTP access for elb',
             allowAllOutbound: true,
@@ -570,14 +570,14 @@ export class ElbStack extends cdk.Stack {
             'Allow elb HTTP from anywhere for elb'
         );
 
-        const alb = new elbv2.ApplicationLoadBalancer(this, 'FrontLB', {
+        const alb = new elbv2.ApplicationLoadBalancer(this, "FrontLB", {
             vpc: props.vpc,
             internetFacing: true,
             securityGroup: lbSecurityGroup,
             vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC }, 
         });
 
-        const targetGroup = new elbv2.ApplicationTargetGroup(this, 'FrontLBTargetGroup', {
+        const targetGroup = new elbv2.ApplicationTargetGroup(this, "FrontLBTargetGroup", {
             vpc: props.vpc,
             port: 80,
             protocol: elbv2.ApplicationProtocol.HTTP,
@@ -595,7 +595,7 @@ export class ElbStack extends cdk.Stack {
             defaultTargetGroups: [targetGroup],
         });
 
-        const FrontLBEndpoint =new cdk.CfnOutput(this, "ElbStack3-FrontLBEndpoint", {
+        const FrontLBEndpoint =new cdk.CfnOutput(this, "FrontLBEndpoint", {
             value: alb.loadBalancerDnsName,
             exportName: `${id}-Endpoint`, 
         });
