@@ -364,8 +364,7 @@ const rdsStack = new RdsStack(app, "SamplePjRdsStack", {
 });
 ```
 
-rds-stack.tsにスタックの詳細を追記します。
-記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
+rds-stack.tsにスタックの詳細を記載します。
 
 ```ts:lib/rds-stack.ts
 
@@ -410,11 +409,13 @@ export class RdsStack extends cdk.Stack {
 }
 ```
 
+記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
+
 ### 5. EC2スタックを作成する
 
 ![画像](/images/begginer-cdk/handson_cfn3_ec2.drawio.png)
 
-tmp.tsにEC2スタックの詳細を追記します。
+tmp.tsにEC2スタックの詳細を記載します。
 
 ```ts:bin/tmp.ts
 import * as cdk from 'aws-cdk-lib';
@@ -439,8 +440,7 @@ const ec2Stack = new Ec2Stack(app, "SamplePjEc2Stack", {
 });
 ```
 
-ec2-stack.tsにスタックの詳細を追記します。
-記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
+ec2-stack.tsにスタックの詳細を記載します。
 
 ```ts:lib/ec2-stack.ts
 import * as cdk from "aws-cdk-lib";
@@ -502,11 +502,13 @@ export class Ec2Stack extends cdk.Stack {
 }
 ```
 
+記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
+
 ### 6. ELBスタックを作成する
 
 ![画像](/images/begginer-aws-cfn/handson_cfn4_elb.drawio.png)
 
-tmp.tsにELBスタックを追記します。
+tmp.tsにELBスタックを記載します。
 
 ```ts:bin/tmp.ts
 import * as cdk from 'aws-cdk-lib';
@@ -539,7 +541,6 @@ const elbStack = new ElbStack(app, "SamplePjElbStack", {
 ```
 
 elb-stack.tsにスタックの詳細を記載します。
-記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
 
 ```ts:lib/elb-stack.ts
 import * as cdk from 'aws-cdk-lib';
@@ -602,6 +603,8 @@ export class ElbStack extends cdk.Stack {
 }
 
 ```
+
+記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
 
 ## さいごに
 
