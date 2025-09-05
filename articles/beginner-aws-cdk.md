@@ -281,10 +281,13 @@ const vpcStack = new VpcStack(app, "SamplePjVpcStack");
 
 :::message alert
 
-#### 論理IDの変更にはご注意ください
+#### 論理IDについて
 
 コンストラクタの第2引数に指定する文字列をconstructIDといいます。
-このconstructIDを変更したり、Constructを別の階層に移動すると論理IDが変わり、置き換えが発生します。
+`const vpcStack = new VpcStack(app, "SamplePjVpcStack");`の場合、`SamplePjVpcStack`
+
+同一のAWSアカウント内で作成したリソースに対しては、このconstructIDが重複する状態でデプロイを仮に行った場合、置き換えが発生します。
+命名規則が設けられていないケースなどでは、既存のリソースを上書きすることによってデータを削除するリスクもあるので、後述する`cdk diffコマンド`の活用が重要です。
 
 :::
 
