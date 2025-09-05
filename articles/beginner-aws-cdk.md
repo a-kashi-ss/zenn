@@ -229,9 +229,10 @@ AWS CDKの環境構築が完了していることを前提に、作業の流れ�
 任意のフォルダ内で、必要なファイルをセットアップします。
 
 - `cdk init app --language [language]`
-- languageの部分は利用するプログラミング言語を指定 (例：`cdk init app --language typescript`)
+- languageの部分は利用するプログラミング言語を指定
+  (例：`cdk init app --language typescript`)
 
-※ 対象アカウント・リージョンにつき、初回1回のみ`cdk bootstrap`コマンドを実行してCDK環境を初期化が必要。
+※ 対象アカウント・リージョンにつき、初回1回のみ`cdk bootstrap`コマンドを実行してCDK環境の初期化が必要。
 
 ### 2. アプリケーションの使用を宣言する
 
