@@ -30,7 +30,7 @@ publication_name: "secondselection"
 VPC内にパブリックサブネットとプライベートサブネットを配置し、パブリックサブネットには外部公開用のEC2、プライベートサブネットにはDBを設置します。外部からのアクセスはELBを経由してEC2へ振り分けられる構成です。
 ![画像](/images/begginer-cdk/cdk_architecture.drawio.png)
 
-CloudFormationについて確認したい方やネットワークの基礎について、前回作成した記事には記載してますので、必要に応じて下記はご参照ください。
+CloudFormationについて確認したい方やネットワークの基礎について、前回作成した記事に記載してますので、必要に応じて下記はご参照ください。
 @[card](https://zenn.dev/secondselection/articles/beginner-aws-cfn)
 
 ## CloudFormationとAWS CDKの違いは？
