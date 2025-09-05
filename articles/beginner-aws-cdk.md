@@ -228,9 +228,28 @@ AWS CDKの環境構築が完了していることを前提に、作業の流れ�
 
 任意のフォルダ内で、必要なファイルをセットアップします。
 
+- `mkdir tmp`
+- `cd tmp`
+
 - `cdk init app --language [language]`
-- languageの部分は利用するプログラミング言語を指定
-  (例：`cdk init app --language typescript`)
+  - languageの部分は利用するプログラミング言語を指定
+
+今回は`cdk init app --language typescript`を実行し、ディレクトリとファイルが下記のように作成されました。
+
+```
+├── README.md
+├── bin
+│   └── tmp.ts
+├── cdk.json
+├── jest.config.js
+├── lib
+│   └── tmp.ts
+├── node_modules
+├── package-lock.json
+├── package.json
+├── test
+└── tsconfig.json
+```
 
 ※ 対象アカウント・リージョンにつき、初回1回のみ`cdk bootstrap`コマンドを実行してCDK環境の初期化が必要。
 
