@@ -607,6 +607,11 @@ export class ElbStack extends cdk.Stack {
 
 記載後`cdk diffコマンド`を実行し、内容を確認して問題なければ`cdk deployコマンド`を実行します。
 
+### 7. EC2にアクセスできることを確認する
+
+- CloudFormationのELBスタックのDNS名(出力欄の値)を、新しいタブもしくはウィンドウで入力して、EC2上のWordPressの初期設定画面が表示されることを確認します。
+（WordPressの設定は[こちら](https://catalog.us-east-1.prod.workshops.aws/workshops/47782ec0-8e8c-41e8-b873-9da91e822b36/ja-JP/simple-mode/40-wp#)をご確認ください）
+
 ## さいごに
 
 あくまで個人の意見ですが、今回AWS CDKで環境構築をしてみて、CloudFormationより難しいけど楽しいし便利だなあと感じています。
