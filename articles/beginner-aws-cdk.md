@@ -492,7 +492,7 @@ export class Ec2Stack extends cdk.Stack {
 
         const publicSubnet = props.vpc.publicSubnets[0];
 
-        this.instance = new ec2.Instance(this, "Ec2Stack3", {
+        this.instance = new ec2.Instance(this, "Ec2", {
             vpc: props.vpc,
             vpcSubnets: { subnets: [publicSubnet] }, 
             instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
