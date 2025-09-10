@@ -4,11 +4,7 @@ emoji: "🌎"
 type: "tech"
 topics: ["aws", "CDK", "cloudformation", "初心者",  "zennfes2025infra"]
 published: true
-<<<<<<< HEAD
 published_at: 2025-09-16 06:00
-=======
-published_at: 2025-09-15 05:00
->>>>>>> refs/remotes/origin/beginner-AWS-CDK
 publication_name: "secondselection"
 ---
 
@@ -496,20 +492,12 @@ export class Ec2Stack extends cdk.Stack {
 
         const publicSubnet = props.vpc.publicSubnets[0];
 
-<<<<<<< HEAD
         this.instance = new ec2.Instance(this, "Ec2", {
-=======
-        this.instance = new ec2.Instance(this, "Ec2Stack3", {
->>>>>>> refs/remotes/origin/beginner-AWS-CDK
             vpc: props.vpc,
             vpcSubnets: { subnets: [publicSubnet] }, 
             instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
             machineImage: ec2.MachineImage.genericLinux({
-<<<<<<< HEAD
                 'ap-northeast-1': 'ami-09ed31f8f34719e20' // Amazon Linux 2のインスタンスイメージ
-=======
-                'ap-northeast-1': 'ami-09ed31f8f34719e20'
->>>>>>> refs/remotes/origin/beginner-AWS-CDK
             }),
             securityGroup: sg,
             role,
