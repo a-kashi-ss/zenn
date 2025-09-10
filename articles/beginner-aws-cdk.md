@@ -497,7 +497,7 @@ export class Ec2Stack extends cdk.Stack {
             vpcSubnets: { subnets: [publicSubnet] }, 
             instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
             machineImage: ec2.MachineImage.genericLinux({
-                'ap-northeast-1': 'ami-09ed31f8f34719e20'
+                'ap-northeast-1': 'ami-09ed31f8f34719e20' // Amazon Linux 2のインスタンスイメージ
             }),
             securityGroup: sg,
             role,
