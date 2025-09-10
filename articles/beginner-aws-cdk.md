@@ -4,7 +4,7 @@ emoji: "🌎"
 type: "tech"
 topics: ["aws", "CDK", "cloudformation", "初心者",  "zennfes2025infra"]
 published: true
-published_at: 2025-09-15 05:00
+published_at: 2025-09-16 06:00
 publication_name: "secondselection"
 ---
 
