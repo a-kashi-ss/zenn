@@ -97,24 +97,8 @@ Dashboardsは`http://localhost:5601/`で開けます。
 まずは単一ドキュメント登録です。
 `<index>`と`<id>`は任意名です。
 
-<!-- 
-📝この辺もサンプルデータとは異なるものを勝手にデータを作っているっぽい
-```http
-PUT /sample/_doc/1
-{ "title": "hello", "tags": ["note"], "count": 1 }
-``` -->
-
 次に複数ドキュメントの一括登録です。
 `_bulk`は1行1コマンドで書きます。
-
-<!-- 📝この辺もサンプルデータとは異なるものを勝手にデータを作っているっぽい
-```http
-POST /sample/_bulk
-{ "index": { "_id": "2" } }
-{ "title": "bulk-1", "tags": ["bulk"], "count": 10 }
-{ "index": { "_id": "3" } }
-{ "title": "bulk-2", "tags": ["bulk"], "count": 20 }
-``` -->
 
 ### 3.1 動的マッピングと明示的マッピング
 
@@ -123,22 +107,6 @@ POST /sample/_bulk
 
 明示的マッピングは最初に型を決めます。
 検索の精度や集計の安定性が高まります。
-
-<!-- 📝この辺もサンプルデータとは異なるものを勝手にデータを作っているっぽい
-```http
-PUT /product
-{
-  "settings": { "number_of_shards": 1, "number_of_replicas": 1 },
-  "mappings": {
-    "properties": {
-      "name": { "type": "keyword" },
-      "desc": { "type": "text" },
-      "price": { "type": "float" },
-      "released_at": { "type": "date" }
-    }
-  }
-}
-``` -->
 
 ## 4. 検索実験
 
@@ -153,29 +121,7 @@ GET /sample/_search
 
 ### 4.2 キーワード検索
 
-<!-- 
-📝この辺もサンプルデータとは異なるものを勝手にデータを作っているっぽい
-```http
-GET /sample/_search
-{
-  "query": {
-    "match": { "title": "hello" }
-  }
-}
-``` -->
-
 ### 4.3 範囲検索
-
-<!-- 
-📝この辺もサンプルデータとは異なるものを勝手にデータを作っているっぽい
-```http
-GET /sample/_search
-{
-  "query": {
-    "range": { "count": { "gte": 10, "lte": 30 } }
-  }
-}
-``` -->
 
 レスポンス例はDashboardsのDev Toolsや`curl`で確認できます。
 フィールドの型に合ったクエリを選ぶことが大切です。
@@ -183,27 +129,6 @@ GET /sample/_search
 ## 5. ダッシュボード作成
 
 Dashboardsを開いて、次の順に試します。
-<!-- 
-📝この部分は探り探りやっていて、メモに残せていなかったので削除
-### 5.1 Index Pattern登録
-
-Index Patternsで`sample`を登録します。
-
-### 5.2 Discoverで確認
-
-Discoverで投入データを検索して確認します。
-
-### 5.3 Visualizeで可視化
-
-Visualizeでチャートを作成し、ダッシュボードに配置します。
-
-可視化の例は次のとおりです。
-
-- ドキュメント数の折れ線グラフ。
-- タグ別件数の棒グラフ。
-- 検索応答時間のメトリクス。
-
-ダッシュボードに並べると全体像を把握しやすくなります。 -->
 
 ## 6. ISMでデータ寿命を管理
 
@@ -254,16 +179,6 @@ PUT /logs-000001
 
 データ投入と検索は次のとおりです。
 
-<!-- これも読み込ませてない...
-```http
-POST /logs-write/_doc
-{ "message": "started", "level": "info", "ts": "2025-09-10T00:00:00Z" }
-
-GET /logs-*/_search
-{ "query": { "range": { "ts": { "gte": "now-1d/d" } } } }
-``` -->
-
-<!-- ロールオーバー後は`logs-000002`が自動作成されます。これも私の予測だけで検証不足 -->
 7日後に古いインデックスが削除されます。
 
 ## 7. まとめ
