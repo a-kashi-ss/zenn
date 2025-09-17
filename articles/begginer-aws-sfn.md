@@ -370,8 +370,8 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 ## 3. Serverless Frameworkについて
 
-上記でStep Functionsを用いたワークフローを紹介しました。  
-このワークフローをIaC(Infrastructure as Code)でAWS環境へデプロイできるツールが **Serverless Framework** です。
+前項では、Step Functionsを用いたワークフローを紹介しました。  
+Step FunctionsのワークフローをIaC(Infrastructure as Code)でAWS環境へデプロイできるツールが **Serverless Framework** です。
 
 :::details  📝 IaCとは？
 
