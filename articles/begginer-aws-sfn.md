@@ -44,7 +44,8 @@ Lambda関数を1つ呼び出して終了する単純な構成(左図)と、入�
 >
 > (参照元:[AWS Hands-on for Begginers](https://pages.awscloud.com/JAPAN-event-OE-Hands-on-for-Beginners-StepFunctions-2022-reg-event.html?trk=aws_introduction_page))
 
-サーバーの管理はAWSに任せて、GUIを使って画面上でリソースを選びワークフローを組み立てることで、アプリケーションを作成できます。
+AWSのサーバレスサービスの1つで、複数のサービスを組み合わせる機能が提供されています。
+コンソール上でブロックを視覚的につなぎ合わせることができます。
 
 - **ステート**
   - ワークフローを構成する個々のステップ
