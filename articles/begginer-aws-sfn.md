@@ -164,7 +164,7 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 ### 2-3. 作成したワークフロー・手順
 
-⽇本語のテキストを英訳化・⾳声化するサーバーレスなワークフローを作成しました。
+ハンズオンの案内に沿って、⽇本語のテキストを英訳化・⾳声化するサーバーレスなワークフローを作成しました。
 ![画像](/images/begginer-aws-sfn/handson_sfn_workflow.drawio.png)*[参照元:AWS Hands-on for Begginers AWS Step Functions入門](https://pages.awscloud.com/JAPAN-event-OE-Hands-on-for-Beginners-StepFunctions-2022-reg-event.html?trk=aws_introduction_page)*
 
 :::details  📝 各サービスの概要は、こちらからご確認ください。
