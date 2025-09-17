@@ -592,13 +592,13 @@ $ sls invoke stepf --name StateMachine1
 $ sls invoke stepf --name StateMachine1 --data '{"input":"XXXXX"}'
 ```
 
-#### CLIでの確認例(step1の場合)
+- CLIでの確認例(step1の場合)
 
-![画像](/images/begginer-aws-sfn/serverlessframework_step1_cli.drawio.png)
+  ![画像](/images/begginer-aws-sfn/serverlessframework_step1_cli.drawio.png)
 
-#### GUIでの確認例(step1の場合)
+- GUIでの確認例(step1の場合)
 
-![画像](/images/begginer-aws-sfn/serverlessframework_step1_gui.drawio.png)
+  ![画像](/images/begginer-aws-sfn/serverlessframework_step1_gui.drawio.png)
 
 ## 4. おわりに
 
