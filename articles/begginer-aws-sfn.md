@@ -408,15 +408,15 @@ Serverless Frameworkは、サーバーレスアプリケーションの開発と
 $ python3 -V
 > Python 3.11.2
 
+# Node.js: Serverless Framework自体や関連パッケージが依存する実行環境
+$ node -v
+> v20.19.4
+
 # Serverless Framework: AWSリソースをデプロイ・管理するためのフレームワーク
 $ serverless -v
 > Framework Core: 3.40.0
 > Plugin: 7.2.3
 > SDK: 4.5.1
-
-# Node.js: Serverless Framework自体や関連パッケージが依存する実行環境
-$ node -v
-> v20.19.4
 
 # AWS CLI: AWSの各種サービスを操作するための公式コマンドラインツール
 $ aws --version
