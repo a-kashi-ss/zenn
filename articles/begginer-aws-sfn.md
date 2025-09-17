@@ -221,6 +221,8 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 上記のハンズオンで構成を作成した結果、下記のステートマシンが完成しました。
 
+![画像](/images/begginer-aws-sfn/handson_sfn.drawio.png)
+
 :::details  📝 ASLのJSONファイルは、こちらをご確認ください。
 
 ```json
@@ -365,8 +367,6 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 ```
 
 :::
-
-![画像](/images/begginer-aws-sfn/handson_sfn.drawio.png)
 
 ## 3. Serverless Frameworkについて
 
