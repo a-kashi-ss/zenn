@@ -74,7 +74,95 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 :::
 
-### 2-2. 作成したワークフロー・手順
+### 2-2. 基本機能
+
+アクション・フローの使い方とAPIパラメータ可変項目の参照指定方法がポイントと感じたので、詳細を説明します。
+
+#### 《アクション・フローの使い方》
+
+- **アクション**  
+  各AWSサービスのAPIを呼び出す機能です。  
+  例えば「DynamoDBにデータを書き込む」「Lambda関数を実行する」といった処理を選択できます。
+
+- **フロー**  
+  ワークフロー全体の流れを制御する機能です。  
+  例えば「条件分岐（Choice）」「並列処理（Parallel）」「待機（Wait）」など、アクションをどのように実行・接続するかを定義します。
+
+![画像](/images/begginer-aws-sfn/handson_sfn_basic1.drawio.png)
+
+どんな**アクション**や**フロー**を使用するかが決まれば、ドラッグ&ドロップ(イメージ:画像内青矢印)を行い、ワークフローを組み立てていきます。
+
+#### 《APIパラメータ可変項目の参照指定》
+
+入力したJSONの値をステートマシンのアクションで使う場合のルールは以下の通りです。
+
+- APIパラメータのキーにJSONPathを割り当てる場合 → キー名の後ろに `.$` をつける  
+- 値としてJSONPathを指定する場合 → 先頭に `$.`をつけて、入力JSON内のパスを記述する  
+
+:::details  📝 具体例をご紹介します。
+
+- DynamoDBのArticleテーブルにAriticleIDが文字列は`S`(sentenceの頭文字)として登録されている状態です。
+![画像](/images/begginer-aws-sfn/handson_sfn_dynamodb.drawio.png)
+
+- StepFunctionsで、ArticleIDを0001と固定値として指定した場合、入出力結果は下記のとおりです。
+
+```json
+// ステートマシーンに登録するDynamoDB GetItemのAPIパラメータ(固定値での確認)
+
+{
+  "TableName": "Article",
+  "Key": {
+    "ArticleID": {
+      "S": "0001"
+    }
+  },
+  {省略}
+}
+
+```
+
+```json
+// ステートマシーン作成後の実行結果
+
+// 入力 
+{
+ "ArticleID": "0001"
+}
+
+// 出力 DynamoDBにArticleIDが0001で登録されている情報が出力されます。
+{
+  "Item": {
+    "ArticleID": {
+      "S": "0001"
+    },
+    "Detail": {
+      "S": "AWS Step Functions は、AWS のサービスのオーケストレーション、ビジネスプロセスの自動化、サーバーレスアプリケーションの構築に使用されるローコードの視覚的なワークフローサービスです。ワークフローは、障害、再試行、並列化、サービス統合、可観測性などを管理するため、デベロッパーはより価値の高いビジネスロジックに集中することができます。"
+    }
+  },
+  {省略}
+}
+```
+
+- `"ArticleID": {"S": "0001"}`の部分をAPIパラメータ可変項目として、参照するためには前述のルールに従い`"S.$": "$.ArticleID"`と設定します。
+
+```json
+// ステートマシーンに登録するDynamoDB GetItemのAPIパラメータ(可変値での設定方法)
+
+{
+  "TableName": "Article",
+  "Key": {
+    "ArticleID": {
+      "S.$": "$.ArticleID"
+    }
+  },
+  {}
+}
+
+```
+
+:::
+
+### 2-3. 作成したワークフロー・手順
 
 ⽇本語のテキストを英訳化・⾳声化するサーバーレスなワークフローを作成しました。
 ![画像](/images/begginer-aws-sfn/handson_sfn_workflow.drawio.png)*[参照元:AWS Hands-on for Begginers AWS Step Functions入門](https://pages.awscloud.com/JAPAN-event-OE-Hands-on-for-Beginners-StepFunctions-2022-reg-event.html?trk=aws_introduction_page)*
@@ -279,94 +367,6 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 :::
 
 ![画像](/images/begginer-aws-sfn/handson_sfn.drawio.png)
-
-### 2-3. 基本機能
-
-アクション・フローの使い方とAPIパラメータ可変項目の参照指定方法がポイントと感じたので、詳細を説明します。
-
-#### 《アクション・フローの使い方》
-
-- **アクション**  
-  各AWSサービスのAPIを呼び出す機能です。  
-  例えば「DynamoDBにデータを書き込む」「Lambda関数を実行する」といった処理を選択できます。
-
-- **フロー**  
-  ワークフロー全体の流れを制御する機能です。  
-  例えば「条件分岐（Choice）」「並列処理（Parallel）」「待機（Wait）」など、アクションをどのように実行・接続するかを定義します。
-
-![画像](/images/begginer-aws-sfn/handson_sfn_basic1.drawio.png)
-
-どんな**アクション**や**フロー**を使用するかが決まれば、ドラッグ&ドロップ(イメージ:画像内青矢印)を行い、ワークフローを組み立てていきます。
-
-#### 《APIパラメータ可変項目の参照指定》
-
-入力したJSONの値をステートマシンのアクションで使う場合のルールは以下の通りです。
-
-- APIパラメータのキーにJSONPathを割り当てる場合 → キー名の後ろに `.$` をつける  
-- 値としてJSONPathを指定する場合 → 先頭に `$.`をつけて、入力JSON内のパスを記述する  
-
-:::details  📝 具体例をご紹介します。
-
-- DynamoDBのArticleテーブルにAriticleIDが文字列は`S`(sentenceの頭文字)として登録されている状態です。
-![画像](/images/begginer-aws-sfn/handson_sfn_dynamodb.drawio.png)
-
-- StepFunctionsで、ArticleIDを0001と固定値として指定した場合、入出力結果は下記のとおりです。
-
-```json
-// ステートマシーンに登録するDynamoDB GetItemのAPIパラメータ(固定値での確認)
-
-{
-  "TableName": "Article",
-  "Key": {
-    "ArticleID": {
-      "S": "0001"
-    }
-  },
-  {省略}
-}
-
-```
-
-```json
-// ステートマシーン作成後の実行結果
-
-// 入力 
-{
- "ArticleID": "0001"
-}
-
-// 出力 DynamoDBにArticleIDが0001で登録されている情報が出力されます。
-{
-  "Item": {
-    "ArticleID": {
-      "S": "0001"
-    },
-    "Detail": {
-      "S": "AWS Step Functions は、AWS のサービスのオーケストレーション、ビジネスプロセスの自動化、サーバーレスアプリケーションの構築に使用されるローコードの視覚的なワークフローサービスです。ワークフローは、障害、再試行、並列化、サービス統合、可観測性などを管理するため、デベロッパーはより価値の高いビジネスロジックに集中することができます。"
-    }
-  },
-  {省略}
-}
-```
-
-- `"ArticleID": {"S": "0001"}`の部分をAPIパラメータ可変項目として、参照するためには前述のルールに従い`"S.$": "$.ArticleID"`と設定します。
-
-```json
-// ステートマシーンに登録するDynamoDB GetItemのAPIパラメータ(可変値での設定方法)
-
-{
-  "TableName": "Article",
-  "Key": {
-    "ArticleID": {
-      "S.$": "$.ArticleID"
-    }
-  },
-  {}
-}
-
-```
-
-:::
 
 ## 3. Serverless Frameworkについて
 
