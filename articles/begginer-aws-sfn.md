@@ -1,6 +1,6 @@
 ---
-title: "StepFunctions+ServerlessFramework【初心者向け・IaC入門】※タイトルはまだ決めてません※"
-emoji: "🏗"
+title: "AWSサーバーレス入門｜StepFunctionsの基本からIaCで最小構成でデプロイまで"
+emoji: "🧵"
 type: "tech"
 topics: ["aws","stepfunctions","serverlessframework","iac","初心者"]
 published: true
@@ -11,14 +11,15 @@ publication_name: "secondselection"
 ## 1. はじめに
 
 今回はAWSのサーバーレスアーキテクチャをGUIから始めてIaCで構築しました。
-StepFunctionsをはじめて使用したなかで感じたポイントから、Serverless Frameworkでのデプロイ手順までご紹介します。
+Step Functionsをはじめて使用して学んだ基本から、Serverless Frameworkでのデプロイ手順までまとめました。
+この記事が私と同じようなAWS初心者の方にとって有益な情報となれば幸いです。
 
 **💡 対象読者**
 ・AWSの基本（LambdaやS3, DynamoDB, ポリシーなど）を把握しており、Step Functionsを体験したい人。
 ・サーバーレスアーキテクチャに興味のある方。
 
 **💡 この記事を通して得られること**
-・Step Functionsのステートマシン設計の基本（Task, Choice, Wait, 並列処理など）の理解。
+・Step Functionsのステートマシン設計の基本（Task, Choice, Wait, Parallelなど）の理解。
 ・Serverless Frameworkを使って、最小構成でStep Functionsをデプロイする。
 
 ### 今回作成したワークフロー
@@ -64,7 +65,7 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 ### 2-2. 基本機能
 
-アクション・フローの使い方とAPIパラメータ可変項目の参照指定方法がポイントと感じたので、詳細を説明します。
+アクション・フローの使い方とAPIパラメータ可変項目の参照指定方法について説明します。
 
 #### 《アクション・フローの使い方》
 
@@ -78,7 +79,7 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 ![画像](/images/begginer-aws-sfn/handson_sfn_basic1.drawio.png)
 
-どんな**アクション**や**フロー**を使用するかが決まれば、ドラッグ&ドロップ(イメージ:画像内青矢印)を行い、ワークフローを組み立てていきます。
+どんな**アクション**や**フロー**を使用するかが決まれば、ドラッグ&ドロップを行い、ワークフローを組み立てていきます。
 
 #### 《APIパラメータ可変項目の参照指定》
 
@@ -602,7 +603,8 @@ $ sls invoke stepf --name StateMachine1 --data '{"input":"XXXXX"}'
 
 ## 4. おわりに
 
-今回の記事が私と同じようなAWS初心者の方にとって有益な情報となっていれば幸いです。
+仮想サーバーを手動で設定・管理できるサービスからはじめて、今回サーバーレスに取り組みました。
+ユースケースに合わせていて適切な設定ができるようになりたいというところが、今後の意気込みです。
 最後までご覧いただき、ありがとうございました。
 
 ## 5. 参考
