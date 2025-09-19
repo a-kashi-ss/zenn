@@ -583,8 +583,9 @@ $ sls invoke stepf --name StateMachine1 --data '{"input":"XXXXX"}'
 
 ## 4. おわりに
 
-仮想サーバーを手動で設定・管理できるサービスからはじめて、今回サーバーレスに取り組みました。
-ユースケースに合わせていて適切な設定ができるようになりたいというところが、今後の意気込みです。
+仮想サーバーを手動で設定・管理できるサービスからはじめて、今回サーバーレス×IaCに取り組みました。
+AWS CDKも少し触ってみたので、今後の意気込みとしては[AWS SAM](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam.html)も実際に触ってそれぞれのメリット・デメリット・特徴を理解していきたいと考えています。
+
 最後までご覧いただき、ありがとうございました。
 
 ## 5. 参考
