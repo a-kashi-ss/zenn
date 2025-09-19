@@ -31,7 +31,7 @@ Step Functionsをはじめて使用して学んだ基本から、Serverless Fram
 
 #### 《Serverless Framework》
 
-Lambda関数を1つ呼び出して終了する単純な構成(左図)と、入力値に応じて分岐するChoiceステートを持つ構成(右図)を作成しました。
+Lambda関数を1つ呼び出して終了する直列処理(左図)と、入力値によって分岐する並行処理(右図)を作成しました。
 
 ![画像](/images/begginer-aws-sfn/serverlessframework.drawio.png)
 
