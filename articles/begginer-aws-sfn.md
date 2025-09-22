@@ -60,7 +60,7 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
     | **Pass**     | そのまま次に渡す  |
 
 - **ステートマシン**
-  - ワークフロー全体のことで、「**Amazon States Language（以下ASL）**」というJSONベースの言語で定義します。
+  - ワークフロー全体のことで、「**Amazon States Language**」というJSONベースの言語で定義します。
 
 ### 2-2. 基本
 
@@ -200,156 +200,11 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 :::
 
-#### 《今回作成したステートマシーンのASL》
+#### 《今回作成したステートマシーン》
 
 上記のハンズオンで構成を作成した結果、下記のステートマシンが完成しました。
 
 ![画像](/images/begginer-aws-sfn/handson_sfn.drawio.png)
-
-:::details  📝 ASLのJSONファイルは、こちらをご確認ください。
-
-```json
-{
-  "Comment": "A description of my state machine",
-  "StartAt": "DynamoDB GetItem",
-  "States": {
-    "DynamoDB GetItem": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:dynamodb:getItem",
-      "Parameters": {
-        "Key": {
-          "ArticleID": {
-            "S.$": "$.ArticleID"
-          }
-        },
-        "TableName": "Article"
-      },
-      "Next": "Choice-Item Is Present"
-    },
-    "Choice-Item Is Present": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Variable": "$.Item",
-          "IsPresent": true,
-          "Next": "Parallel"
-        }
-      ],
-      "Default": "Fail"
-    },
-    "Parallel": {
-      "Type": "Parallel",
-      "End": true,
-      "Branches": [
-        {
-          "StartAt": "TranslateText",
-          "States": {
-            "TranslateText": {
-              "Type": "Task",
-              "Parameters": {
-                "SourceLanguageCode": "ja",
-                "TargetLanguageCode": "en",
-                "Text.$": "$.Item.Detail.S"
-              },
-              "Resource": "arn:aws:states:::aws-sdk:translate:translateText",
-              "Next": "DynamoDB UpdateItem - EnglishVerison",
-              "ResultPath": "$.Result"
-            },
-            "DynamoDB UpdateItem - EnglishVerison": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::aws-sdk:dynamodb:updateItem",
-              "Parameters": {
-                "TableName": "Article",
-                "Key": {
-                  "ArticleID": {
-                    "S.$": "$.Item.ArticleID.S"
-                  }
-                },
-                "UpdateExpression": "SET EnglishVersion = :EnglishVestionRef",
-                "ExpressionAttributeValues": {
-                  ":EnglishVestionRef": {
-                    "S.$": "$.Result.TranslatedText"
-                  }
-                }
-              },
-              "End": true
-            }
-          }
-        },
-        {
-          "StartAt": "StartSpeechSynthesisTask",
-          "States": {
-            "StartSpeechSynthesisTask": {
-              "Type": "Task",
-              "Parameters": {
-                "OutputFormat": "mp3",
-                "OutputS3BucketName": "h4b-stepfunctions-output-20250915",
-                "Text.$": "$.Item.Detail.S",
-                "VoiceId": "Mizuki"
-              },
-              "Resource": "arn:aws:states:::aws-sdk:polly:startSpeechSynthesisTask",
-              "ResultPath": "$.Result",
-              "Next": "GetSpeechSynthesisTask"
-            },
-            "GetSpeechSynthesisTask": {
-              "Type": "Task",
-              "Parameters": {
-                "TaskId.$": "$.Result.SynthesisTask.TaskId"
-              },
-              "Resource": "arn:aws:states:::aws-sdk:polly:getSpeechSynthesisTask",
-              "ResultPath": "$.Result",
-              "Next": "Choice -Task is completed"
-            },
-            "Choice -Task is completed": {
-              "Type": "Choice",
-              "Choices": [
-                {
-                  "Variable": "$.Result.SynthesisTask.TaskStatus",
-                  "StringMatches": "completed",
-                  "Next": "DynamoDB UpdateItem -mp3 URL"
-                }
-              ],
-              "Default": "Wait"
-            },
-            "DynamoDB UpdateItem -mp3 URL": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::dynamodb:updateItem",
-              "Parameters": {
-                "TableName": "Article",
-                "Key": {
-                  "ArticleID": {
-                    "S.$": "$.Item.ArticleID.S"
-                  }
-                },
-                "UpdateExpression": "SET S3URL = :S3URLRef",
-                "ExpressionAttributeValues": {
-                  ":S3URLRef": {
-                    "S.$": "$.Result.SynthesisTask.OutputUri"
-                  }
-                }
-              },
-              "End": true
-            },
-            "Wait": {
-              "Type": "Wait",
-              "Seconds": 5,
-              "Next": "GetSpeechSynthesisTask"
-            }
-          }
-        }
-      ]
-    },
-    "Fail": {
-      "Type": "Fail"
-    }
-  },
-  "QueryLanguage": "JSONPath",
-  "TimeoutSeconds": 30
-}
-
-```
-
-:::
 
 ## 3. Serverless Frameworkについて
 
