@@ -1,10 +1,10 @@
 ---
 title: "AWSサーバーレス入門｜StepFunctionsの基本からIaCで最小構成でデプロイまで"
-emoji: "🧵"
+emoji: "📶"
 type: "tech"
 topics: ["aws","stepfunctions","serverlessframework","iac","初心者"]
 published: true
-published_at: 2025-09-22 06:00
+published_at: 2025-09-29 06:00
 publication_name: "secondselection"
 ---
 
