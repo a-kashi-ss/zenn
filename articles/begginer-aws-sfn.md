@@ -328,6 +328,8 @@ Serverless Frameworkの定義ファイルである`serverless.yml`を更新し�
 
 Lambda関数を1つ呼び出して終了する単純な構成のステートマシンを作成します。
 
+![画像](/images/begginer-aws-sfn/serverlessframework_1hellojapan.drawio.png)
+
 :::details  📝 step1のサンプルコード。
 
 ```yml
@@ -366,6 +368,8 @@ stepFunctions:
 ##### 【step2の場合】
 
 入力値に応じて分岐するChoiceステートを持つステートマシンを作成します。
+
+![画像](/images/begginer-aws-sfn/serverlessframework_2helloworld.drawio.png)
 
 :::details  📝 step2のサンプルコード。
 
