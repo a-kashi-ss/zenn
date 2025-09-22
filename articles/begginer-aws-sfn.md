@@ -98,7 +98,7 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 
 :::
 
-:::details  📝 具体例をご紹介します。
+:::details  📝 DynamoDBで変数を参照した際の具体例をご紹介します。
 
 - DynamoDBのArticleテーブルがあり、キーとしてAriticleIDが文字列`S`(sentenceの頭文字)として存在します。
 ![画像](/images/begginer-aws-sfn/handson_sfn_dynamodb.drawio.png)
@@ -111,7 +111,7 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
   "TableName": "Article",
   "Key": {
     "ArticleID": {
-      "S.$": "$.ArticleID"
+      "S.$": "$.Article.ID"
     }
   },
   {}
@@ -124,7 +124,9 @@ AWSのサーバレスサービスの1つで、複数のサービスを組み合�
 ```json
 // 入力
 {
- "ArticleID": "0001"
+ "Article": {
+   "ID": "0001"
+ }
 }
 
 // 出力 (DynamoDBにArticleIDが0001で登録されている情報が出力されます。)
