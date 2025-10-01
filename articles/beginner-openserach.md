@@ -243,7 +243,7 @@ GET /iot-sensor/_search
 
 ## 5. ダッシュボードの作成方法
 
-環境構築・ダミーデータの作成ができれば、Visualizationを新規作成しデータを用途に応じて可視化ができます。グラフは下記のような種類が用意されています。
+環境構築およびデータ登録後、Visualizationを新規作成しデータを用途に応じて可視化ができます。グラフは下記のような種類が用意されています。
 
 ![画像](/images/beginner-openserach/opensearch_dashboard.drawio.png)
 
