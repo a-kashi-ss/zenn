@@ -42,7 +42,7 @@ OpenSearchは主に下記の3つの構成要素から成り立っています。
 OpenSearchとOpenSearch Dashboardsを動かすための基本構成を作っていきます。
 （[公式ドキュメント](https://docs.opensearch.org/latest/getting-started/quickstart/)の記載内容をベースに作成）
 
-### 2-3. セットアップ
+### 2-1. セットアップ
 
 OpenSearchのサーバとDashboardsを動かせるように、起動設定を用意します。
 
@@ -115,7 +115,7 @@ networks:
   opensearch-net:
 ```
 
-### 2-4. パスワードを設定
+### 2-2. パスワードを設定
 
 パスワードを決め、下記のように環境変数として設定します。
 
@@ -123,7 +123,7 @@ networks:
 export OPENSEARCH_INITIAL_ADMIN_PASSWORD=<password>
 ```
 
-### 2-5. コンテナを起動
+### 2-3. コンテナを起動
 
 以下のコマンドを実行して、コンテナをバックグラウンドで起動します。
 
