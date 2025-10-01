@@ -136,7 +136,7 @@ docker compose up -d
 
 ## 3. データの登録方法
 
-OpenSearch DashboardsのDev toolsを使って、OpenSearchに対してCRUD操作をします。
+OpenSearch DashboardsのDev toolsを使って、OpenSearchを操作します。
 OpenSearch Dashboardsのホーム画面の右上にあるDev toolsをクリックするとコマンド入力画面が表示されます。
 
 ![画像](/images/beginner-openserach/opensearch_ui.drawio.png)
