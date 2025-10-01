@@ -44,14 +44,15 @@ OpenSearchとOpenSearch Dashboardsを動かすための基本構成を作って�
 
 ### 2-1. セットアップ
 
-OpenSearchのサーバとDashboardsを動かせるように、起動設定を用意します。
-
-ディレクトリを作成し、docker-compose.ymlを配置したあと、下記内容を記述します。
+ディレクトリを作成し、`docker-compose.yml`ファイルを作成します。
 
 ```bash
 mkdir opensearch-cluster
 touch docker-compose.yml
 ```
+
+`docker-compose.yml`ファイルに記載します。
+（今回は公式ドキュメントの[開発用のDocker Composeファイル](https://docs.opensearch.org/latest/install-and-configure/install-opensearch/docker/#sample-docker-compose-file-for-development)のクラスタ構成をそのまま使用しました）。
 
 ```yml: docker-compose.yml
 services:
