@@ -42,44 +42,6 @@ OpenSearchは主に下記の3つの構成要素から成り立っています。
 OpenSearchとOpenSearch Dashboardsを動かすための基本構成を作っていきます。
 （[公式ドキュメント](https://docs.opensearch.org/latest/getting-started/quickstart/)の記載内容をベースに作成）
 
-### 2-1. OpenSearchをダウンロード
-
-OpenSearchをダウンロードして実行するために、DockerHubからpullします。
-
-```
-docker pull opensearchproject/opensearch:latest && docker run -it -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "DISABLE_SECURITY_PLUGIN=true" opensearchproject/opensearch:latest
-```
-
-### 2-2. curlで接続確認
-
-OpenSearchが起動して使える状態か確認します。
-
-```bash
-curl http://localhost:9200
-```
-
-起動ができている場合、次のような応答が返されます。
-
-```json
-{
-  "name" : "c1b0bc962b3f",
-  "cluster_name" : "docker-cluster",
-  "cluster_uuid" : "Ybkj0rsdSCiRRsnt70GWnQ",
-  "version" : {
-    "distribution" : "opensearch",
-    "number" : "3.2.0",
-    "build_type" : "tar",
-    "build_hash" : "6adc0bf476e1624190564d7fbe4aba00ccf49ad8",
-    "build_date" : "2025-08-12T03:55:01.226522683Z",
-    "build_snapshot" : false,
-    "lucene_version" : "10.2.2",
-    "minimum_wire_compatibility_version" : "2.19.0",
-    "minimum_index_compatibility_version" : "2.0.0"
-  },
-  "tagline" : "The OpenSearch Project: https://opensearch.org/"
-}
-```
-
 ### 2-3. セットアップ
 
 OpenSearchのサーバとDashboardsを動かせるように、起動設定を用意します。
