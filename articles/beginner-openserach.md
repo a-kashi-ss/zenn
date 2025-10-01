@@ -24,7 +24,7 @@ OpenSearchとは、オープンソースの全文検索・分析エンジンで�
 AWS上でOpenSearchを管理するためのサービスが「Amazon OpenSearch Service」です。
 
 OpenSearchは、データを登録・検索・分析するエンジン本体で、API（HTTPリクエスト）経由でドキュメントを登録したり検索クエリを投げたり、集計などの処理を行います。
-一方、OpenSearch Dashboardsは、OpenSearch上のデータを見える形にして操作するためのUIです。Dashboardsを使うと、検索結果をグラフや表にして表示したり、ダッシュボードを作成して複数の可視化をまとめて表示したり、時系列での変化を追うことができます。
+OpenSearchをGUIで操作するOpenSearch Dashboardsというツールがあります。OpenSearch Dashboardsを使うと、検索結果をグラフや表にして表示したり、ダッシュボードを作成して複数の可視化をまとめて表示したり、時系列での変化を追うことができます。
 
 ### 構成要素
 
