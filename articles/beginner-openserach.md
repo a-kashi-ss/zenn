@@ -310,7 +310,7 @@ PUT _plugins/_ism/policies/iot-data-policy
 
 今回Amazon OpenSearch Serviceの機能を確認するため、ローカルでコスト発生なしで色々お試しできました。この記事が同じような初学者の方の学習の助けになりましたら幸いです。
 
-少し余談ですが、AWS OpenSearchで蓄積された固有の知識ベースを活かしてRAG（検索拡張生成）の実装をした記事（参考記事は[こちら](https://aws.amazon.com/jp/blogs/news/multi-tenant-rag-implementation-with-amazon-bedrock-and-amazon-opensearch-service-for-saas-using-jwt/)）を見かけました。AWSの生成AIアプリケーション(Amazon Bedrock)で構築できる事例を知り、興味深かったです。
+少し余談ですが、Amazon OpenSearch Serviceで蓄積された固有の知識ベースを活かしてRAG（検索拡張生成）の実装をした記事（参考記事は[こちら](https://aws.amazon.com/jp/blogs/news/multi-tenant-rag-implementation-with-amazon-bedrock-and-amazon-opensearch-service-for-saas-using-jwt/)）を見かけました。AWSの生成AIアプリケーション(Amazon Bedrock)で構築できる事例を知り、興味深かったです。
 
 最近業務外で[AWS Kiro](https://kiro.dev/)を触ったり[マナビDX](https://service.signate.jp/manabi-dx-quest-2025)を通してAI関連も少しずつ学んでいるので、いずれそんな内容もアウトプットできるようになりたいと考えています。
 
