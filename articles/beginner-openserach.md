@@ -326,6 +326,8 @@ PUT _plugins/_ism/policies/iot-data-policy
 }
 ```
 
+:::message
+
 ### 有効期限の設定方法
 
 - `"rollover": {"min_index_age": "1d" }`
@@ -333,6 +335,8 @@ PUT _plugins/_ism/policies/iot-data-policy
 
 - `"conditions": { "min_index_age": "7d" }`
   - ロールオーバー後、インデックスが7日経過したら削除対象とします。
+
+:::
 
 ### 登録内容
 
