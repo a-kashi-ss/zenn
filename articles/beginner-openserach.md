@@ -250,7 +250,7 @@ GET /iot-sensor/_search
 ### サンプル
 
 ![画像](/images/beginner-openserach/opensearch_visualization.drawio.png)
-「3-1. インデックス作成」で登録したデータをもとに作成可能です。
+「3-1. インデックス作成」で登録したデータをもとに作成した内容です。
 
 - 1.ホーム画面左上の「≡」をクリック
 - 2.OpenSearchDashboardsの「∨」記号をクリック
