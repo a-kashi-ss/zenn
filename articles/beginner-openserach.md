@@ -247,8 +247,43 @@ GET /iot-sensor/_search
 
 ![画像](/images/beginner-openserach/opensearch_dashboard.drawio.png)
 
-こちらの記事に作成方法の詳細が記載されていますので、お試しされたい方はぜひご参照ください。
-> @[card](https://blog.shikoan.com/opensearch-dashboards-docker/)
+### サンプル
+
+![画像](/images/beginner-openserach/opensearch_visualization.drawio.png)
+「3-1. インデックス作成」で登録したデータをもとに作成可能です。
+
+- 1.ホーム画面左上の「≡」をクリック
+- 2.OpenSearchDashboardsの「∨」記号をクリック
+- 3.「Visualize」をクリック
+- 4.Visualizationsのページが表示されたことを確認し、「Createvisualization」をクリック
+
+  ![画像](/images/beginner-openserach/opensearch_visualization1.drawio.png)
+
+- 5.New Visualizationのポップアップが表示されたことを確認し、「Data Table」をクリック
+- 4.New Data Table/Choose a sourceのポップアップが表示されたことを確認し、「iot-sensor」をクリック
+
+  ![画像](/images/beginner-openserach/opensearch_visualization2.drawio.png)
+
+- 5.Visualizeのcreate画面が表示されたことを確認し、右側のサイドバー内の「Metric」をクリック
+- 6.「Agrregation」欄に集計方法を選択し、「Field」に集計する項目を選択
+  - 補足:画面のサンプルでは、Abrregation欄にAbverage(平均)、Field欄はtemparature(温度)を選んでいます。
+- 7.画面右下の「Updateボタン」をクリックし、想定している内容が画面上で取得できているか確認
+- 8.Metricを追加する場合「＋add」ボタンをクリックし、6と同じ要領で登録
+  ![画像](/images/beginner-openserach/opensearch_visualization3.drawio.png)
+
+- 9.Metricの登録がすべて完了すれば、画面右上の「Save」ボタンをクリック
+- 10.Save visualizationのポップアップが表示されたことを確認し、Titleを登録しvisualizationの保存完了
+  ![画像](/images/beginner-openserach/opensearch_visualization4.drawio.png)
+
+:::message
+
+**indexに格納済みのデータも再計算できます。**
+
+- 画像サンプルは、inputで入力済の摂氏を華氏で表示させる内容です。
+- Metricを追加し、Advanced欄のJSONinputに処理内容を記述します。
+  ![画像](/images/beginner-openserach/opensearch_visualization5.drawio.png)
+
+:::
 
 ## 6. 不要になったデータを自動的に破棄する方法
 
