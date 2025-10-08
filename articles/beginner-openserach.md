@@ -4,7 +4,7 @@ emoji: "🍿"
 type: "tech"
 topics: ["opensearch", "aws", "docker", "elasticsearch", "初心者"]
 published: true
-published_at: 2025-10-13 06:00
+published_at: 2025-10-14 06:00
 publication_name: "secondselection"
 ---
 ## 0. はじめに
