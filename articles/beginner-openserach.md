@@ -398,13 +398,6 @@ PUT _plugins/_ism/policies/test_policy
 - 左のサイドーのリスト表示される`Policy managed indexes`をクリック
 - `Policy managed index`画面が表示されるので、正しくアタッチできたかどうかを確認
 
-### 登録内容
-
-登録内容は下記の通りです。
-![画像](/images/beginner-openserach/opensearch_ism_cli.drawio.png)
-
-![画像](/images/beginner-openserach/opensearch_ism_gui.drawio.png)
-
 ## 7. さいごに
 
 今回Amazon OpenSearch Serviceの機能を確認するため、ローカルでコスト発生なしで色々お試しできました。この記事が同じような初学者の方の学習の助けになりましたら幸いです。
