@@ -414,3 +414,4 @@ PUT _plugins/_ism/policies/test_policy
 > @[card](https://dev.classmethod.jp/articles/how-to-build-opensearch-with-docker/)
 > @[card](https://zenn.dev/kouichi_itagaki/articles/d77360a5577e7a)
 > @[card](https://blog.shikoan.com/opensearch-dashboards-docker/)
+> @[card](https://repost.aws/ja/knowledge-center/opensearch-low-storage-ism)
