@@ -4,7 +4,7 @@ emoji: "🍿"
 type: "tech"
 topics: ["opensearch", "aws", "docker", "elasticsearch", "初心者"]
 published: true
-published_at: 2025-10-14 06:00
+published_at: 2025-10-20 06:00
 publication_name: "secondselection"
 ---
 ## 0. はじめに
@@ -289,65 +289,87 @@ GET /iot-sensor/_search
 
 :::
 
-## 6. 不要になったデータを自動的に破棄する方法
+## 6. 不要になったデータを自動で破棄する方法
 
-データストアにおいて「データを自動的に有効期限切れにして削除する仕組み」を指す概念は、TTL(Time To Live)と一般的に呼ばれています。
-OpenSearchでのTTLは、主にIndex State Management (以下ISM)というプラグインを使って、インデックス単位でデータのライフサイクルを管理します。
+データストアにおいて「データを自動で有効期限切れにして削除する仕組み」を指す概念は、TTL(Time To Live)と一般的に呼ばれています。
+  
+OpenSearchでのTTLは、主に**Index State Management** (以下ISM)というプラグインを使って、インデックス単位で管理します。具体的には、**ISMポリシー**を用いて、インデックスのライフサイクルを定めて運用します。
 
-削除までの流れを自動化するために、「どの状態でどのアクションを行うか」「次の状態への遷移条件」を定義します。
+:::message
+
+### ISMポリシー
+
+ISMポリシーは、States／Actions／Transitionsの3つを組み合わせて設定します。
+
+| 項目 | 定義内容 |
+|------|------|
+| **States** | インデックスの状態 |
+| **Actions** | インデックスが **特定のステートに入った際に実行される動作**  |
+| **Transitions** | インデックスが **次のステートへ遷移するための条件**  |
+
+:::
+
+データを自動で有効期限切れにするための条件は、「インデックスの経過日数」「ドキュメント数」「ストレージサイズ」などが設定可能です。
+(詳細は[ドキュメント](https://docs.opensearch.org/latest/im-plugin/ism/policies/)をご参照ください。)
+
+### 手順
+
+#### 1. テスト用のインデックスを用意します
 
 ```json
-PUT _plugins/_ism/policies/iot-data-policy
+PUT test-000001/_doc/1
+{
+  "user": "testuser",
+  "post_date": "2020-05-08T14:12:12",
+  "message": "ISM testing"
+}
+```
+
+#### 2. ISMポリシーを作成します
+
+- インデックスの作成後、まずはhotステートとして管理することを定義します。
+  `"default_state": "hot"`
+- インデックスの作成から2分経過後、deleteステートへ遷移し、インデックスを削除します。
+  `"conditions": {"min_index_age": "2m"}`
+
+```json
+PUT _plugins/_ism/policies/delete_policy
 {
   "policy": {
-    "description": "IoT data: rollover daily, delete after 7 days",
+    "description": "delete policy",
     "default_state": "hot",
     "states": [
       {
         "name": "hot",
-        "actions": [
-          {
-            "rollover": {
-              "min_index_age": "1d" 
-            }
-          }
-        ],
+        "actions": [],
         "transitions": [
           {
             "state_name": "delete",
-            "conditions": { "min_index_age": "7d" }
+            "conditions": {
+              "min_index_age": "2m"
+            }
           }
         ]
       },
       {
         "name": "delete",
         "actions": [
-          { "delete": {} }
-        ]
+          {
+            "delete": {}
+          }
+        ],
+        "transitions": []
       }
-    ]
+    ],
+    "ism_template": {
+      "index_patterns": [
+        "generator-*"
+      ],
+      "priority": 100
+    }
   }
 }
 ```
-
-:::message
-
-### 有効期限の設定方法
-
-- `"rollover": {"min_index_age": "1d" }`
-  - インデックスが作成されてから1日が経過したらロールオーバー（新しいインデックスに切り替え）を行います。
-
-- `"conditions": { "min_index_age": "7d" }`
-  - ロールオーバー後、インデックスが7日経過したら削除対象とします。
-
-:::
-
-### 登録内容
-
-登録内容は下記の通りです。
-![画像](/images/beginner-openserach/opensearch_ism_cli.drawio.png)
-
-![画像](/images/beginner-openserach/opensearch_ism_gui.drawio.png)
 
 ## 7. さいごに
 
@@ -365,3 +387,4 @@ PUT _plugins/_ism/policies/iot-data-policy
 > @[card](https://dev.classmethod.jp/articles/how-to-build-opensearch-with-docker/)
 > @[card](https://zenn.dev/kouichi_itagaki/articles/d77360a5577e7a)
 > @[card](https://blog.shikoan.com/opensearch-dashboards-docker/)
+> @[card](https://docs.opensearch.org/latest/im-plugin/ism/policies/)
