@@ -292,11 +292,29 @@ GET /iot-sensor/_search
 ## 6. 不要になったデータを自動で破棄する方法
 
 データストアにおいて「データを自動で有効期限切れにして削除する仕組み」を指す概念は、TTL(Time To Live)と一般的に呼ばれています。
-OpenSearchでのTTLは、主にIndex State Management (以下ISM)というプラグインを使って、インデックス単位でデータのライフサイクルを管理します。
+  
+OpenSearchでのTTLは、主に**Index State Management** (以下ISM)というプラグインを使って、インデックス単位で管理します。具体的には、**ISMポリシー**を用いて、インデックスのライフサイクルを定めて運用します。
+
+:::message
+
+### ISMポリシー
+
+ISMポリシーは、States／Actions／Transitionsの3つを組み合わせて設定します。
+
+| 項目 | 定義内容 |
+|------|------|
+| **States** | インデックスの状態 |
+| **Actions** | インデックスが **特定のステートに入った際に実行される動作**  |
+| **Transitions** | インデックスが **次のステートへ遷移するための条件**  |
+
+:::
+
+データを自動で有効期限切れにするための条件は、「インデックスの経過日数」「ドキュメント数」「ストレージサイズ」などが設定可能です。
+(詳細は[ドキュメント](https://docs.opensearch.org/latest/im-plugin/ism/policies/)をご参照ください。)
 
 ### 手順
 
-テスト用のインデックスとして、下記を用意しました。
+#### 1. テスト用のインデックスを用意します
 
 ```json
 PUT test-000001/_doc/1
@@ -307,62 +325,28 @@ PUT test-000001/_doc/1
 }
 ```
 
-#### 1. エイリアスを設定します
-
-rolloverを行うために、インデックスを指すエイリアスを作成します。
-
-```json
-POST /_aliases
-{
-  "actions": [
-    {
-      "add": {
-        "index": "test-000001",
-        "alias": "test-alias"
-      }
-    }
-  ]
-}
-```
-
 #### 2. ISMポリシーを作成します
 
-:::message
-
-### 有効期限の設定方法
-
-- `"rollover": {"min_index_age": "10m" }`
-  - インデックスが作成されてから10分が経過したらロールオーバー（新しいインデックスに切り替え）を行います。
-
-- `"conditions": { "min_index_age": "20m" }`
-  - ロールオーバー後、インデックスが作成されてから20分が経過したら削除対象とします。
-
-:::
+- インデックスの作成後、まずはhotステートとして管理することを定義します。
+  `"default_state": "hot"`
+- インデックスの作成から2分経過後、deleteステートへ遷移し、インデックスを削除します。
+  `"conditions": {"min_index_age": "2m"}`
 
 ```json
-PUT _plugins/_ism/policies/test_policy
+PUT _plugins/_ism/policies/delete_policy
 {
   "policy": {
-    "description": "test delete",
-    "last_updated_time": 1642027350875,
-    "schema_version": 1,
-    "error_notification": null,
+    "description": "delete policy",
     "default_state": "hot",
     "states": [
       {
         "name": "hot",
-        "actions": [
-          {
-            "rollover": {
-              "min_index_age": "10m"
-            }
-          }
-        ],
+        "actions": [],
         "transitions": [
           {
             "state_name": "delete",
             "conditions": {
-              "min_index_age": "20m"
+              "min_index_age": "2m"
             }
           }
         ]
@@ -379,24 +363,13 @@ PUT _plugins/_ism/policies/test_policy
     ],
     "ism_template": {
       "index_patterns": [
-        "test-*"
+        "generator-*"
       ],
       "priority": 100
     }
   }
 }
 ```
-
-#### 3. ISMポリシーをインデックスにアタッチします
-
-- 左のサイドバーから`Index Management`タブを選択
-- `Indexes`欄の横の「∨」記号をクリックしたあと表示される`Indexes`を選択。
-- ISMポリシーをアタッチするインデックスの左横のチェックボックスを選択
-- 右上の`Actions`をクリックし、`Apply policy`をクリック
-- `Apply policy`のポップアップが表示されたあと、`policyId`の選択肢から`test_policy`を選択し`Apply`ボタンをクリック
-- `Rollover alias`欄でエイリアスを指定し、`Apply`ボタンをクリック
-- 左のサイドーのリスト表示される`Policy managed indexes`をクリック
-- `Policy managed index`画面が表示されるので、正しくアタッチできたかどうかを確認
 
 ## 7. さいごに
 
@@ -414,4 +387,4 @@ PUT _plugins/_ism/policies/test_policy
 > @[card](https://dev.classmethod.jp/articles/how-to-build-opensearch-with-docker/)
 > @[card](https://zenn.dev/kouichi_itagaki/articles/d77360a5577e7a)
 > @[card](https://blog.shikoan.com/opensearch-dashboards-docker/)
-> @[card](https://repost.aws/ja/knowledge-center/opensearch-low-storage-ism)
+> @[card](https://docs.opensearch.org/latest/im-plugin/ism/policies/)
