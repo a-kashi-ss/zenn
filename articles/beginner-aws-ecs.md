@@ -36,7 +36,7 @@ publication_name: "secondselection"
 
 :::details 📝コンテナを使うとき・使わないとき。
 
-![画像](/images/begginer-aws-ecs/merit_docker.drawio.png)*[参照元:【全図解】コンテナ・Dockerから学ぶAmazon ECR・Amazon ECS入門](https://blog.serverworks.co.jp/container-docker-ecs-ecr-beginner-zukai)*
+![画像](/images/beginner-aws-ecs/merit_docker.drawio.png)*[参照元:【全図解】コンテナ・Dockerから学ぶAmazon ECR・Amazon ECS入門](https://blog.serverworks.co.jp/container-docker-ecs-ecr-beginner-zukai)*
 
 :::
 
@@ -54,7 +54,7 @@ ECSを活用することによって、**サービスを安定的に提供し続
 
 :::details 📝オーケストレーションツールがある時・ない時。
 
-![画像](/images/begginer-aws-ecs/merit_container.drawio.png)*[参照元:今さら聞けないAWS ECSとは？Fargateとは？](https://qiita.com/K5K/items/0d8dbdb39fbb0375e2bd)*
+![画像](/images/beginner-aws-ecs/merit_container.drawio.png)*[参照元:今さら聞けないAWS ECSとは？Fargateとは？](https://qiita.com/K5K/items/0d8dbdb39fbb0375e2bd)*
 
 :::
 
@@ -71,7 +71,7 @@ ECSを理解するためには、まず以下の4つの概念を押さえる必�
 | **タスク** | タスク定義に基づき実際に起動した**コンテナ**|
 | **サービス** | タスクを指定数だけ維持し、**復旧・スケーリングを管理** |
 
-![画像](/images/begginer-aws-ecs/ecs_role.drawio.png)*[参照元:【全図解】コンテナ・Dockerから学ぶAmazon ECR・Amazon ECS入門](https://blog.serverworks.co.jp/container-docker-ecs-ecr-beginner-zukai)*
+![画像](/images/beginner-aws-ecs/ecs_role.drawio.png)*[参照元:【全図解】コンテナ・Dockerから学ぶAmazon ECR・Amazon ECS入門](https://blog.serverworks.co.jp/container-docker-ecs-ecr-beginner-zukai)*
 
 ### 3-2. Fargateについて
 
