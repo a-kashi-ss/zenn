@@ -34,7 +34,7 @@ publication_name: "secondselection"
 
 コンテナを使うことによって、実行環境が変わった場合にアプリケーションが動かない...といった不測の事態の発生リスクを軽減できます。
 
-:::details 📝コンテナを使うとき・使わないとき。
+:::details 📝あるとき・ないとき。コンテナ編。
 
 ![画像](/images/beginner-aws-ecs/merit_docker.drawio.png)*[参照元:【全図解】コンテナ・Dockerから学ぶAmazon ECR・Amazon ECS入門](https://blog.serverworks.co.jp/container-docker-ecs-ecr-beginner-zukai)*
 
@@ -52,7 +52,7 @@ publication_name: "secondselection"
 
 ECSを活用することによって、**サービスを安定的に提供し続けるための基盤を整備**できます。
 
-:::details 📝オーケストレーションツールがある時・ない時。
+:::details 📝あるとき・ないとき。オーケストレーションツール編。
 
 ![画像](/images/beginner-aws-ecs/merit_container.drawio.png)*[参照元:今さら聞けないAWS ECSとは？Fargateとは？](https://qiita.com/K5K/items/0d8dbdb39fbb0375e2bd)*
 
