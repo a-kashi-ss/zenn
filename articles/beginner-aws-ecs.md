@@ -26,6 +26,21 @@ publication_name: "secondselection"
 - ECSとFargateの基本概念を理解できる
 - Docker → ECR → Fargateの流れが概要を把握できる
 
+:::details 📝 ECS/EC2/ECRについて。
+
+スペルも似ており初学者には混同しやすい単語の概要を記載しておきます。
+
+- ECR (Elastic Container Registry)
+  - コンテナイメージを安全に保存・管理するAWS版の倉庫
+
+- ECS (Elastic Container Service)
+  - 保存されたコンテナをAWS上で動かし、自動で管理・スケーリングするサービス
+
+- EC2 (Elastic Compute Cloud)
+  - クラウド上で必要な時にすぐ使える、仮想的なレンタルサーバー
+
+:::
+
 ## 2. ECSの概要
 
 ### 2-1. 前提知識
