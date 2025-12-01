@@ -71,7 +71,9 @@ ECSを理解するためには、まず以下の4つの概念を押さえる必�
 | **タスク** | タスク定義に基づき実際に起動した**コンテナ**|
 | **サービス** | タスクを指定数だけ維持し、**復旧・スケーリングを管理** |
 
-![画像](/images/beginner-aws-ecs/ecs_role.drawio.png)*[参照元:【全図解】コンテナ・Dockerから学ぶAmazon ECR・Amazon ECS入門](https://blog.serverworks.co.jp/container-docker-ecs-ecr-beginner-zukai)*
+> アメリカンフットボールなどのスポーツに例えてみると、
+> 個人的に役割分担の区別が明確になりました。
+> ![画像](/images/beginner-aws-ecs/ecs_role.drawio.png)*[参照元:【全図解】コンテナ・Dockerから学ぶAmazon ECR・Amazon ECS入門](https://blog.serverworks.co.jp/container-docker-ecs-ecr-beginner-zukai)*
 
 ### 3-2. Fargateについて
 
