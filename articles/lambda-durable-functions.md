@@ -1,5 +1,5 @@
 ---
-title: "AWS Lambda durable functions(step/wait/parallel/map/retry)"
+title: "AWS Lambda durable functions (Step/Wait/Parallel/Map/Retry)"
 emoji: "🍀"
 type: "tech"
 topics: ["aws", "lambda", "serverless", "tech"]
@@ -11,15 +11,15 @@ publication_name: "secondselection"
 
 ## 1. はじめに
 
-今月リリースされた"Lambda Durable Functions"(以下Durable Functions)を早速使ってみました。
+今月リリースされた「AWS Lambda durable functions」（以下、durable functions）を早速使ってみました。
 「15分の実行時間制限が解除された」という点がまず注目されていますが、実際どのような機能なのか、簡易なサンプルコードを作り動作検証を行いましたので、本記事にまとめます。
 
 ### 対象読者
 
-* Durable Functionsの基本を理解したい方
+* durable functionsの基本を理解したい方
 * Step FunctionsやLambdaのワークフローを改善／見直しを考えている方
 
-## 2. Durable Functionsの特徴
+## 2. durable functionsの特徴
 
 ### これまでのLambdaの特徴
 
@@ -27,10 +27,10 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 
 これまで、長時間実行や複数ステップにまたがる処理を実装するためには、Lambdaを複数利用できる **AWS Step Functions** で実装されていた方も多いのではないでしょうか。
 
-### Durable Functionsの主な特徴
+### durable functionsの主な特徴
 
 * **コードベースでワークフローを記述可能**
-* **自動チェックポイント + 再開 (リプレイ)**
+* **自動チェックポイント + 再開（リプレイ）**
   * 状態管理やリトライを自動化することで、運用の簡素化を図れます。
 * **最大 1 年の待機**が可能
   * 長時間のワークフローに対応しています。
@@ -48,14 +48,14 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
     * **Parallel**: 複数の処理を「並列」にして時間を短縮。
     * **Map**: リストの要素を「分散」してデータを一気に処理。
     * **Retry**: エラー時に再試行する。
-2. **Waitで中断し状態を保存** (一定時間待つ)
+2. **Waitで中断し状態を保存**（一定時間待つ）
 3. **新しい呼び出しとして再開**
 
 ### 利用方法の大きな流れ
 
 1. リージョンをオハイオに変更（※記事執筆時点ではリージョンに制限があったため）
 2. ランタイムを選択する
-3. “Durable execution” を有効化する
+3. Durable execution を有効化する
 4. 設定を保存（Save）する
 5. コードを記述する
 
@@ -63,7 +63,7 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
   * Step別の最大稼働時間を設定します。
 * **永続実行のtimeoutを設定**
   * Lambda関数のトータル時間を設定します。
-* **テスト実行時の呼出しタイプ**
+* **テスト実行時の呼び出しタイプ**
   * 「非同期（Asynchronous）」を選択します。
 
 :::message
@@ -73,10 +73,10 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 
 :::
 
-## 3. 【stait/Wait】サーバーレスで「待つ」を実現する
+## 3. 【Step/Wait】サーバーレスで「待つ」を実現する
 
 基礎となる`step` と `wait`について触れていきます。
-通常のLambda内で待機をする場合課金が発生し続けますが、Durable Functionsの **Waitステート** を使えば、**待機時間は課金対象になりません**。
+通常のLambda内で待機をする場合課金が発生し続けますが、durable functionsの **Waitステート** を使えば、**待機時間は課金対象になりません**。
 （標準ワークフローの場合、状態遷移に対して課金されます）。
 
 * 確認事項
@@ -84,16 +84,16 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 15分の制限について下記パターンを実施し、待機時間を挟むことで制限を超えて動作することを確認しました。
 
 ```text
-- STEPで2分 → wait14分 = 合計16分
+- Stepで2分 → Wait14分 = 合計16分
   - 問題なく実行できることを確認
-- (STEPで1分 → wait7分) × 2 = 合計16分
+- (Stepで1分 → Wait7分) × 2 = 合計16分
   - 問題なく実行できることを確認
   - 実行中にエラーが解消すれば自動で再実行される
 - Stepを8分、連続してStepを8分 = 合計16分
   - タイムアウトが発生する（1ステップあたりの制限）
 ```
 
-* **サンプルコード(stait/Wait編)**
+* **サンプルコード(Step/Wait編)**
 
 ```python
 from aws_durable_execution_sdk_python.config import Duration
@@ -136,7 +136,7 @@ Parallelステートは「あらかじめ決まった数」の処理を並列化
 
 > (1)2秒 (2)5秒 (3)2秒
 
-* **サンプルコード(parallel編)**
+* **サンプルコード(Parallel編)**
 
 ```python
 
@@ -211,7 +211,7 @@ export const handler = withDurableExecution(async (event, context) => {
 今回サンプルコードを書くなかで、Exponential Backoff（指数バックオフ）という考え方を学びました。
 復旧の可能性を高めるために「失敗したら1秒後に再試行、次は2秒後、その次は4秒後…」というように、間隔を空けながらリトライする処理を実装しました。
 
-* **サンプルコード(retry編)**
+* **サンプルコード(Retry編)**
 
 > 3回までリトライを許容。
 > 2回意図してエラーを発生させたあと
