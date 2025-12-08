@@ -55,7 +55,7 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 
 1. リージョンをオハイオに変更（※記事執筆時点ではリージョンに制限があったため）
 2. ランタイムを選択する
-3. Durable execution を有効化する
+3. Durable executionを有効化する
 4. 設定を保存（Save）する
 5. コードを記述する
 
@@ -139,7 +139,6 @@ Parallelステートは「あらかじめ決まった数」の処理を並列化
 * **サンプルコード(Parallel編)**
 
 ```python
-
 import time
 from aws_durable_execution_sdk_python import durable_execution, DurableContext
 
@@ -165,7 +164,6 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
         "orders": batch.all[1].result,
         "inventory": batch.all[2].result,
     }
-
 ```
 
 ## 5. 【Map】動的なリストを「分散」処理する
@@ -175,8 +173,6 @@ Parallelに対し、Mapステートは「配列（リスト）のデータ数」
 * **サンプルコード(Map編)**
 
 ```js
-
-
 import { withDurableExecution } from '@aws/durable-execution-sdk-js';
 
 // --- Step 処理 ---
@@ -201,7 +197,6 @@ export const handler = withDurableExecution(async (event, context) => {
 
   return { results };
 });
-
 ```
 
 ## 6. 【Retry】エラーに強いワークフローを作る
@@ -218,11 +213,10 @@ export const handler = withDurableExecution(async (event, context) => {
 > 処理が成功することを確認。
 
 ```python
-
+import time
 from aws_durable_execution_sdk_python.config import Duration, StepConfig
 from aws_durable_execution_sdk_python.context import DurableContext, StepContext, durable_step
 from aws_durable_execution_sdk_python.execution import durable_execution
-import time
 from aws_durable_execution_sdk_python.retries import RetryDecision
 
 attempt_count = 0
@@ -253,7 +247,6 @@ def retry_strategy(error, attempt_count: int):
     delay_seconds = min(2 ** attempt_count, 300)
     return RetryDecision.retry(Duration(seconds=delay_seconds))
 
-
 @durable_execution
 def lambda_handler(event, context: DurableContext) -> dict:
 
@@ -267,7 +260,6 @@ def lambda_handler(event, context: DurableContext) -> dict:
         "statusCode": 200,
         "body": msg,
     }
-
 ```
 
 ## 7. おわりに
