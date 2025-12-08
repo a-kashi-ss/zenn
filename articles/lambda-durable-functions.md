@@ -263,13 +263,14 @@ def lambda_handler(event, context: DurableContext) -> dict:
 
 ## 7. おわりに
 
-Step Functionsとの使い分けについて様々な考察がありますが、今後AIとの共存のうえでは、コードベースで定義できる本機能が優位になる可能性があると述べられていました。
-[AWS re:Invent 2025 -\[NEW LAUNCH\]Deep Dive on AWS Lambda durable functions (CNS380)](https://www.youtube.com/watch?v=XJ80NBOwsow)
+Step Functionsとの使い分けについて様々な考察がありますが、下記のサイトでは今後AIとの共存のうえでは、コードベースで定義できる本機能が優位になる可能性があると述べられていました。
+@[card](https://www.youtube.com/watch?v=XJ80NBOwsow)
 
-AIとの共存に関するニュースが様々取り上げられていますが、こういった情報収集もしっかり行い動向を見つつ引き続き技術習得を進めていきます。
+様々AIとの共存に関するニュースが取り上げられていますので、こういった情報収集もしっかり行い動向を見つつ引き続き技術習得を進めていきます。
 
 ## 8. 参考
 
 @[card](https://zenn.dev/aws_japan/articles/lambda-durable-functions)
 @[card](https://github.com/aws/aws-durable-execution-sdk-python)
 @[card](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+@[card](https://dev.classmethod.jp/articles/aws-lambda-durable-functions-awsreinvent/)
