@@ -9,166 +9,275 @@ publication_name: "secondselection"
 ---
 
 
-皆さんは **AWS Lambda** を使っていますか？
-サーバーレスでコードが実行できるLambdaは非常に便利ですが、開発が進むにつれてこんな壁にぶつかった経験はないでしょうか。
+## 1. はじめに
 
-* 「APIのレート制限があるから、処理の途中で **1分間待機** させたい」
-* 「画像変換処理を **100件同時に並列** で走らせたい」
-* 「エラーが起きたら、少し待ってから **自動でリトライ** させたい」
+今月リリースされた"Lambda Durable Functions"(以下Durable Functions)を早速使ってみました。
+「15分の実行時間制限が解除された」という点がまず注目されていますが、実際どのような機能なのか、簡易なサンプルコードを作り動作検証を行いましたので、本記事にまとめます。
 
-これらをLambda関数の中だけで実装しようとすると、コードが複雑になり、**実行時間（課金）** も無駄にかかってしまいます。特にLambdaには「最大実行時間15分」という制限があるため、長時間かかる処理は苦手です。
+### 対象読者
 
-そこで登場するのが、**AWS Step Functions** です。
+* Durable Functionsの基本を理解したい方
+* Step FunctionsやLambdaのワークフローを改善／見直しを考えている方
 
-今回は、Azureの「Durable Functions」のようなステートフル（状態を持つ）なワークフローをAWSで実現する方法を解説します。特に、**Step Functionsの4つの基本機能（Wait, Parallel, Map, Retry）** について、初心者向けに分かりやすく説明します。
+## 2. Durable Functionsの特徴
 
-## 1. Lambdaだけでは解決できない課題
+### これまでのLambdaの特徴
 
-Lambdaは基本的に **「短時間」** で **「ステートレス（状態を持たない）」** な処理を行うために設計されています。
+Lambdaは基本的に **「短時間」** で **「ステートレス（状態を持たない）」** な処理を行うために設計されており、15分の実行時間制限がありました。
 
-もしLambdaの中で `time.sleep(60)` のようなコードを書くとどうなるでしょうか？
-処理は止まりますが、**待機している間もLambdaの課金は発生し続けます**。また、エラーハンドリング（再試行処理）をコード内に書くと、ビジネスロジックとエラー処理が混ざり合い、可読性が著しく低下します。
+これまで、長時間実行や複数ステップにまたがる処理を実装するためには、Lambdaを複数利用できる **AWS Step Functions** で実装されていた方も多いのではないでしょうか。
 
-### オーケストレーションツールとしてのStep Functions
+### Durable Functionsの主な特徴
 
-AWS Step Functionsは、複数のAWSサービス（主にLambda）を組み合わせて、1つの連動したアプリケーション（ワークフロー）を構築するサービスです。
+* **コードベースでワークフローを記述可能**
+* **自動チェックポイント + 再開 (リプレイ)**
+  * 状態管理やリトライを自動化することで、運用の簡素化を図れます。
+* **最大 1 年の待機**が可能
+  * 長時間のワークフローに対応しています。
+* **待機中はコンピュート料金が発生しない**
+  * 後述する `wait()` による待機中には、コンピュート料金が発生しないというメリットがあります。
 
-Step Functionsを使えば、**「Aの処理が終わったらBを実行する」「失敗したらCを実行する」** といった制御を、Lambdaのコードから切り離して管理できます。これにより、Lambdaは「純粋なビジネスロジック」だけに集中できるようになるのです。
+### 制約・注意点
 
-## 2. Step Functionsの基本概念
+* サポートランタイムやリージョンが限られている（※記事執筆時点）
+* 「1回の関数呼び出し」の上限実行時間は通常のLambdaと同様。時間処理は `step` や `wait` を利用して分割する必要あり。
 
-Step Functionsでは、ワークフロー全体を **ステートマシン（State Machine）** と呼びます。
-このステートマシンは、**Amazon States Language (ASL)** というJSON形式の言語で定義します。現在はGUIツールの**Workflow Studio**を使うことで、ドラッグ&ドロップで簡単に作成できます。
+#### 今回試した内容
 
-今回は、特に利用頻度の高い以下の4つのステート（状態）に焦点を当てます。
+1. **Step実行**
+    * **Parallel**: 複数の処理を「並列」にして時間を短縮。
+    * **Map**: リストの要素を「分散」してデータを一気に処理。
+    * **Retry**: エラー時に再試行する。
+2. **Waitで中断し状態を保存** (一定時間待つ)
+3. **新しい呼び出しとして再開**
 
-1.**Wait**: 一定時間待つ。
-2.**Parallel**: 複数の処理を並列に行う。
-3.**Map**: リストの要素ごとに処理を繰り返す。
-4.**Retry**: エラー時に再試行する。
+### 利用方法の大きな流れ
 
-## 3. 【Wait】サーバーレスで「待つ」を実現する
+1. リージョンをオハイオに変更（※記事執筆時点ではリージョンに制限があったため）
+2. ランタイムを選択する
+3. “Durable execution” を有効化する
+4. 設定を保存（Save）する
+5. コードを記述する
 
-外部APIへのポーリングや、承認フローの期限待ちなど、「待つ」処理が必要な場面は意外と多いものです。
+* **一般設定のtimeoutを設定**
+  * Step別の最大稼働時間を設定します。
+* **永続実行のtimeoutを設定**
+  * Lambda関数のトータル時間を設定します。
+* **テスト実行時の呼出しタイプ**
+  * 「非同期（Asynchronous）」を選択します。
 
-Lambda内で待機すると課金され続けますが、Step Functionsの **Waitステート** を使えば、**待機時間は課金対象になりません**（標準ワークフローの場合、状態遷移に対して課金されます）。
+:::message
 
-### 使い方
+既存の通常Lambdaから切り替えるは不可。
+新規作成時のみ設定可能です。
 
-Waitステートには2つのモードがあります。
+:::
 
-* **指定時間待機**：「60秒待つ」など、相対時間を指定。
-* **タイムスタンプ待機**：「2025-01-01 09:00:00まで待つ」など、絶対日時を指定。
+## 3. 【stait/Wait】サーバーレスで「待つ」を実現する
 
-```json
-"WaitState": {
-  "Type": "Wait",
-  "Seconds": 60,
-  "Next": "NextState"
-}
+基礎となる`step` と `wait`について触れていきます。
+通常のLambda内で待機をする場合課金が発生し続けますが、Durable Functionsの **Waitステート** を使えば、**待機時間は課金対象になりません**。
+（標準ワークフローの場合、状態遷移に対して課金されます）。
+
+* 確認事項
+
+15分の制限について下記パターンを実施し、待機時間を挟むことで制限を超えて動作することを確認しました。
+
+```text
+- STEPで2分 → wait14分 = 合計16分
+  - 問題なく実行できることを確認
+- (STEPで1分 → wait7分) × 2 = 合計16分
+  - 問題なく実行できることを確認
+  - 実行中にエラーが解消すれば自動で再実行される
+- Stepを8分、連続してStepを8分 = 合計16分
+  - タイムアウトが発生する（1ステップあたりの制限）
 ```
 
-例えば、「ユーザー登録後にウェルカムメールを送り、1日待ってからチュートリアルメールを送る」といったマーケティングオートメーションのような処理も、サーバーレスで簡単に実装できます。
+* **サンプルコード(stait/Wait編)**
+
+```python
+from aws_durable_execution_sdk_python.config import Duration
+from aws_durable_execution_sdk_python.context import DurableContext, StepContext, durable_step
+from aws_durable_execution_sdk_python.execution import durable_execution
+import time
+
+@durable_step
+def my_step(step_context: StepContext, my_arg: int) -> str:
+    step_context.logger.info("Hello from my_step")
+    time.sleep(60)
+    return f"from my_step: {my_arg}"
+
+@durable_execution
+def lambda_handler(event, context) -> dict:
+    steps_config = [
+        (123, "1st"),
+        (456, "2nd")
+    ]
+    
+    msg = "" 
+
+    for arg_value, label in steps_config:
+        msg = context.step(my_step(arg_value))        
+        context.wait(Duration.from_seconds(420))
+
+    return {
+        "statusCode": 200,
+        "body": msg,
+    }
+
+```
 
 ## 4. 【Parallel】複数の処理を「並列」に走らせる
 
-「データの保存」と「通知の送信」のように、互いに依存しない処理を順番（直列）に行うのは時間の無駄です。Step FunctionsのParallelステートを使えば、定義した複数のブランチ（処理フロー）を同時にヨーイドンで実行できます。
+Parallelステートは「あらかじめ決まった数」の処理を並列化して実行します。
 
-特徴
-全ブランチの完了を待機: 定義した全ての並列処理が終わるまで、次のステップには進みません。
+このステートの確認として、処理時間が異なる3つの処理を行いました。
+3つの処理が並列に開始され、最も長い処理（5秒）に合わせて終了することを確認しました。
 
-結果の集約: 各ブランチの実行結果は、1つの配列（JSON配列）にまとめられて次のステートへ渡されます。
+> (1)2秒 (2)5秒 (3)2秒
 
-活用例：ECサイトの注文処理
-在庫引当処理（Lambda A）
+* **サンプルコード(parallel編)**
 
-決済処理（Lambda B）
+```python
 
-配送手配（Lambda C）
+import time
+from aws_durable_execution_sdk_python import durable_execution, DurableContext
 
-これらをParallelで実行することで、ユーザーへのレスポンス時間を短縮できます。もしどれか1つでも失敗した場合のエラーハンドリングも一括で設定可能です。
+@durable_execution
+def lambda_handler(event: dict, context: DurableContext) -> dict:
+    # 各 API 呼び出し（模擬）をステップ関数にまとめる
+    def call_user(ctx: DurableContext):
+        return ctx.step(lambda _: (time.sleep(2), {"user_id": "U001", "name": "Taro", "email": "taro@example.com"})[1],
+                        name="user_api")
+
+    def call_orders(ctx: DurableContext):
+        return ctx.step(lambda _: (time.sleep(5), {"order_id": "O001", "items": ["item1"], "total": 1000})[1],
+                        name="orders_api")
+
+    def call_inventory(ctx: DurableContext):
+        return ctx.step(lambda _: (time.sleep(2), {"product_id": "P001", "stock": 50})[1],
+                        name="inventory_api")
+
+    batch = context.parallel([call_user, call_orders, call_inventory], name="parallel_demo")
+
+    return {
+        "user": batch.all[0].result,
+        "orders": batch.all[1].result,
+        "inventory": batch.all[2].result,
+    }
+
+```
 
 ## 5. 【Map】動的なリストを「分散」処理する
 
-Parallelステートは「あらかじめ決まった数」の処理を並列化するのに対し、Mapステートは「配列（リスト）のデータ数」に応じて動的に処理を並列化します。プログラミングにおけるfor文やforeachループをイメージしてください。
+Parallelに対し、Mapステートは「配列（リスト）のデータ数」に応じて動的に処理を並列化します。
 
-通常のMapとDistributed Map
-Inline Map（通常のMap）: 数十～数百程度の並列処理向け。
+* **サンプルコード(Map編)**
 
-Distributed Map（分散マップ）: 最大1万並列という大規模な並列処理が可能。S3上の数千個のCSVファイルなどを処理するのに最適です。
+```js
 
-設定例
-入力データとして[1, 2, 3]という配列が渡された場合は、Mapステート内のLambdaが5回起動します。それぞれが独立して計算します。
 
-```json
-"MapState": {
-  "Type": "Map",
-  "ItemsPath": "$.inputArray",
-  "ItemProcessor": {
-    "StartAt": "ProcessItem",
-    "States": {
-      "ProcessItem": {
-        "Type": "Task",
-        "Resource": "arn:aws:lambda:...",
-        "End": true
-      }
-    }
-  },
-  "Next": "Finish"
+import { withDurableExecution } from '@aws/durable-execution-sdk-js';
+
+// --- Step 処理 ---
+async function processItem(item) {
+  return {
+    id: item.id,
+    result: `processed-${item.id}`,
+    timestamp: new Date().toISOString(),
+  };
 }
+
+export const handler = withDurableExecution(async (event, context) => {
+
+  const items = event.items;
+
+  const results = await context.map(
+    items,
+    (childCtx, item) =>
+      childCtx.step(`process-${item.id}`, async () => processItem(item)),
+    { maxConcurrency: 5 }
+  );
+
+  return { results };
+});
+
 ```
 
-これにより、大量のデータ処理も驚くほど短時間で完了させることができます。
+## 6. 【Retry】エラーに強いワークフローを作る
 
-## 6. 【Retry / Catch】エラーに強いワークフローを作る
+エラーが起きたら、少し待ってから **自動でリトライ** させるということが叶います。
 
-クラウド開発において「一時的なエラー」はつきものです。ネットワークの瞬断やAPIのスロットリング（レート制限）などでLambdaが失敗した際、すぐに諦めてエラーにするのは得策ではありません。
+今回サンプルコードを書くなかで、Exponential Backoff（指数バックオフ）という考え方を学びました。
+復旧の可能性を高めるために「失敗したら1秒後に再試行、次は2秒後、その次は4秒後…」というように、間隔を空けながらリトライする処理を実装しました。
 
-Step Functionsでは、コードを書き換えることなく、JSON定義だけで高度なリトライ戦略を設定できます。
+* **サンプルコード(retry編)**
 
-Retry（自動再試行）の設定
-特に重要なのがExponential Backoff（指数バックオフ）という考え方です。「失敗したら1秒後に再試行、次は2秒後、その次は4秒後…」というように、間隔を空けながらリトライすることで、復旧の可能性を高めます。
+> 3回までリトライを許容。
+> 2回意図してエラーを発生させたあと
+> 処理が成功することを確認。
 
-```json
-"Retry": [
-  {
-    "ErrorEquals": ["States.TaskFailed"],
-    "IntervalSeconds": 1,
-    "MaxAttempts": 3,
-    "BackoffRate": 2.0
-  }
-]
+```python
+
+from aws_durable_execution_sdk_python.config import Duration, StepConfig
+from aws_durable_execution_sdk_python.context import DurableContext, StepContext, durable_step
+from aws_durable_execution_sdk_python.execution import durable_execution
+import time
+from aws_durable_execution_sdk_python.retries import RetryDecision
+
+attempt_count = 0
+
+@durable_step
+def my_step(step_context: StepContext, my_arg: int) -> str:
+    global attempt_count
+    attempt_count += 1
+
+    step_context.logger.info(f"my_step called {attempt_count} times")
+
+    # 1回目は失敗
+    if attempt_count == 1:
+        raise Exception("Fail on first attempt for retry test")
+        # return f"from my_step: {my_arg}"
+
+    # 2回目も失敗
+    if attempt_count == 2:
+        raise Exception("Fail on first attempt for retry test2")
+
+    return f"from my_step: {my_arg}"
+
+def retry_strategy(error, attempt_count: int):
+    """ RetryDecision を返す """
+    if attempt_count >= 3:
+        return RetryDecision.no_retry()
+
+    delay_seconds = min(2 ** attempt_count, 300)
+    return RetryDecision.retry(Duration(seconds=delay_seconds))
+
+
+@durable_execution
+def lambda_handler(event, context: DurableContext) -> dict:
+
+    msg: str = context.step(
+        my_step(123),
+        name='call-api',
+        config=StepConfig(retry_strategy=retry_strategy),
+    )
+
+    return {
+        "statusCode": 200,
+        "body": msg,
+    }
+
 ```
 
-ErrorEquals: 特定のエラーだけリトライする（例：Lambda.TooManyRequestsException）。
+## 7. おわりに
 
-BackoffRate: 待機時間を何倍にしていくか。
+Step Functionsとの使い分けについて様々な考察がありますが、今後AIとの共存のうえでは、コードベースで定義できる本機能が優位になる可能性があると述べられていました。
+[AWS re:Invent 2025 -\[NEW LAUNCH\]Deep Dive on AWS Lambda durable functions (CNS380)](https://www.youtube.com/watch?v=XJ80NBOwsow)
 
-Catch（エラー捕捉）。
-Retryしてもダメだった場合、Catchブロックを使って「エラー通知用のフロー」へ分岐させることができます。「3回リトライしても失敗したら、Slackにアラートを飛ばして終了する」といった制御が、ワークフロー図を見るだけで直感的に理解できるようになります。
+AIとの共存に関するニュースが様々取り上げられていますが、こういった情報収集もしっかり行い動向を見つつ引き続き技術習得を進めていきます。
 
-## 7. まとめ
-
-今回は、AWS Lambdaの可能性を広げるStep Functionsの主要機能について解説しました。
-
-Wait: サーバーレスで賢く「待つ」。
-
-Parallel: 処理を「並列」にして時間を短縮。
-
-Map: 大量のデータを「分散」して一気に処理。
-
-Retry: コードを書かずに「堅牢」なエラー処理を実現。
-
-これらを組み合わせることで、Lambda単体では難しかった複雑な業務ロジックも、シンプルかつ低コストで実装できるようになります。
-
-Next Action: まずは触ってみよう
-百聞は一見に如かずです。AWSマネジメントコンソールからStep Functionsを開き、Workflow Studioを起動してみてください。ドラッグ&ドロップで「Wait」や「Lambda」を配置し、実際に動かしてみることで、その便利さを体感できるはずです。
-
-株式会社セカンドセレクションでは、こうしたクラウドネイティブな技術を活用し、お客様の課題解決に取り組んでいます。 今後も技術ブログで役立つ情報を発信していきますので、ぜひチェックしてください！
-
-※本記事は2025年時点の情報を基に執筆しています。AWSのサービス内容はアップデートにより変更される可能性があります。
-
-## 参考
+## 8. 参考
 
 @[card](https://zenn.dev/aws_japan/articles/lambda-durable-functions)
 @[card](https://github.com/aws/aws-durable-execution-sdk-python)
