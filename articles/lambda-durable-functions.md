@@ -1,5 +1,5 @@
 ---
-title: "AWS Lambda durable functionsについてお試してみた (Pythonでparallel/map/retryなど)"
+title: "AWS Lambda durable functionsを試してみた (Pythonでparallel/map/retryなど)"
 emoji: "🔄"
 type: "tech"
 topics: ["aws", "lambda", "serverless", "tech", "stepfunctions"]
