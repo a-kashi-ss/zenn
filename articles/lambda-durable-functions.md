@@ -34,7 +34,7 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 * **最大 1 年の待機**が可能
   * 長時間のワークフローに対応しています。
 * **待機中はコンピュート料金が発生しない**
-  * 後述する `wait()` による待機中には、
+  * 後述する `wait` による待機中には、
     コンピュート料金が発生しないというメリットがあります。
 
 ### 制約・注意点
@@ -128,7 +128,7 @@ def lambda_handler(event, context) -> dict:
 
 ![画像](/images/lambda-durable-functions/test_basic.drawio.png)
 
-## 4. 【Parallel】複数の処理を「並列」に走らせる
+## 4. 【parallel】複数の処理を「並列」に走らせる
 
 Parallelは「あらかじめ決まった数」の処理を並列化して実行します。
 
@@ -137,7 +137,7 @@ Parallelは「あらかじめ決まった数」の処理を並列化して実行
 > 処理時間が異なる3つの処理を行いました（5秒／3秒／2秒）。
 > 3つの処理が並列に開始され、最も長い処理（5秒）に合わせて終了することを確認しました。
 
-* **サンプルコード(Parallel編)**
+* **サンプルコード(parallel編)**
 
 ```python
 from aws_durable_execution_sdk_python import durable_execution, DurableContext
@@ -165,9 +165,9 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
 
 ![画像](/images/lambda-durable-functions/test_parallel.drawio.png)
 
-## 5. 【Map】動的なリストを「分散」処理する
+## 5. 【map】動的なリストを「分散」処理する
 
-Mapは「配列（リスト）のデータ数」に応じて動的に処理を並列化します。
+mapは「配列（リスト）のデータ数」に応じて動的に処理を並列化します。
 
 > **【検証内容】**
 >
@@ -194,7 +194,7 @@ def lambda_handler(event: dict, context: DurableContext) -> BatchResult[int]:
 
 ![画像](/images/lambda-durable-functions/test_map.drawio.png)
 
-## 6. 【Retry】エラーに強いワークフローを作る
+## 6. 【retry】エラーに強いワークフローを作る
 
 エラーが起きたら、少し待ってから **自動でリトライ** させることが可能です。
 
