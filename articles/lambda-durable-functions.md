@@ -4,7 +4,7 @@ emoji: "🔄"
 type: "tech"
 topics: ["aws", "lambda", "serverless", "tech", "stepfunctions"]
 published: true
-published_at: 2025-12-15 05:00
+published_at: 2025-12-22 05:00
 publication_name: "secondselection"
 ---
 
