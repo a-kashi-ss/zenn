@@ -99,7 +99,7 @@ durable functionsの **Waitステート** を使えば、**待機時間は課金
 
 ```python
 from aws_durable_execution_sdk_python.config import Duration
-from aws_durable_execution_sdk_python.context import DurableContext, StepContext, durable_step
+from aws_durable_execution_sdk_python.context import StepContext, durable_step
 from aws_durable_execution_sdk_python.execution import durable_execution
 import time
 
@@ -111,22 +111,15 @@ def my_step(step_context: StepContext, my_arg: int) -> str:
 
 @durable_execution
 def lambda_handler(event, context) -> dict:
-    steps_config = [
-        (123, "1st"),
-        (456, "2nd")
-    ]
-    
+    steps_config = [123, 456]
     msg = "" 
-
-    for arg_value, label in steps_config:
-        msg = context.step(my_step(arg_value))        
+    for arg in steps_config:
+        msg = context.step(my_step(arg))        
         context.wait(Duration.from_seconds(420))
-
     return {
         "statusCode": 200,
         "body": msg,
     }
-
 ```
 
 ## 4. 【Parallel】複数の処理を「並列」に走らせる
@@ -140,12 +133,12 @@ Parallelステートは「あらかじめ決まった数」の処理を並列化
 * **サンプルコード(Parallel編)**
 
 ```python
-import time
 from aws_durable_execution_sdk_python import durable_execution, DurableContext
+import time
 
 @durable_execution
 def lambda_handler(event: dict, context: DurableContext) -> dict:
-    # 各 API 呼び出し（模擬）をステップ関数にまとめる
+
     def call_user(ctx: DurableContext):
         return ctx.step(lambda _: (time.sleep(2), {"user_id": "U001", "name": "Taro", "email": "taro@example.com"})[1],
                         name="user_api")
@@ -159,7 +152,6 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
                         name="inventory_api")
 
     batch = context.parallel([call_user, call_orders, call_inventory], name="parallel_demo")
-
     return {
         "user": batch.all[0].result,
         "orders": batch.all[1].result,
@@ -173,31 +165,21 @@ Parallelに対し、Mapステートは「配列（リスト）のデータ数」
 
 * **サンプルコード(Map編)**
 
-```js
-import { withDurableExecution } from '@aws/durable-execution-sdk-js';
+```python
+from aws_durable_execution_sdk_python import (
+    DurableContext,
+    durable_execution,
+    BatchResult,
+)
 
-// --- Step 処理 ---
-async function processItem(item) {
-  return {
-    id: item.id,
-    result: `processed-${item.id}`,
-    timestamp: new Date().toISOString(),
-  };
-}
+def square(context: DurableContext, item: int, index: int, items: list[int]) -> int:
+    return item * item
 
-export const handler = withDurableExecution(async (event, context) => {
-
-  const items = event.items;
-
-  const results = await context.map(
-    items,
-    (childCtx, item) =>
-      childCtx.step(`process-${item.id}`, async () => processItem(item)),
-    { maxConcurrency: 5 }
-  );
-
-  return { results };
-});
+@durable_execution
+def lambda_handler(event: dict, context: DurableContext) -> BatchResult[int]:
+    items = [1, 2, 3]
+    result = context.map(items, square)
+    return result
 ```
 
 ## 6. 【Retry】エラーに強いワークフローを作る
