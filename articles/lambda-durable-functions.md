@@ -130,7 +130,7 @@ def lambda_handler(event, context) -> dict:
 
 ## 4. 【Parallel】複数の処理を「並列」に走らせる
 
-Parallelステートは「あらかじめ決まった数」の処理を並列化して実行します。
+Parallelは「あらかじめ決まった数」の処理を並列化して実行します。
 
 > **【検証内容】**
 >
@@ -167,7 +167,7 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
 
 ## 5. 【Map】動的なリストを「分散」処理する
 
-Parallelに対し、Mapステートは「配列（リスト）のデータ数」に応じて動的に処理を並列化します。
+Mapは「配列（リスト）のデータ数」に応じて動的に処理を並列化します。
 
 > **【検証内容】**
 >
