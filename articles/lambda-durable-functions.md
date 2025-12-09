@@ -67,6 +67,8 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 7. `永続実行`のtimeoutを設定する（**Lambda関数のトータルの実行時間**を設定）
 8. テスト実行時の呼び出しタイプを`非同期`を選択する
 
+![画像](/images/lambda-durable-functions/procedure.drawio.png)
+
 :::message alert
 
 既存の通常Lambdaから切り替えは不可。
