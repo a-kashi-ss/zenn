@@ -4,14 +4,14 @@ emoji: "🍀"
 type: "tech"
 topics: ["aws", "lambda", "serverless", "tech", "stepfunctions"]
 published: true
-published_at: 2025-12-22 05:00
+published_at: 2025-12-15 05:00
 publication_name: "secondselection"
 ---
 
 ## 1. はじめに
 
-今月リリースされた「AWS Lambda durable functions」（以下、durable functions）を早速使ってみました。
-私はこの内容を聞いた時「15分の実行時間制限が解除された」点にまず着目したのですが、簡易なサンプルコードを使いながら実際どのような機能なのかを確認しましたので、本記事にまとめます。
+今月リリースされた「**AWS Lambda durable functions**」（以下、durable functions）を早速使ってみました。
+私はこの内容を聞いた時**15分の実行時間制限が解除された**点にまず着目したのですが、簡易なサンプルコードを使いながら実際どのような機能なのかを確認しましたので、本記事にまとめます。
 
 :::message
 
