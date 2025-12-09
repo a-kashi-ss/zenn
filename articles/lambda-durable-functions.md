@@ -122,6 +122,8 @@ def lambda_handler(event, context) -> dict:
     }
 ```
 
+![画像](/images/lambda-durable-functions/test_basic.drawio.png)
+
 ## 4. 【Parallel】複数の処理を「並列」に走らせる
 
 Parallelステートは「あらかじめ決まった数」の処理を並列化して実行します。
@@ -139,25 +141,24 @@ import time
 @durable_execution
 def lambda_handler(event: dict, context: DurableContext) -> dict:
 
-    def call_user(ctx: DurableContext):
-        return ctx.step(lambda _: (time.sleep(2), {"user_id": "U001", "name": "Taro", "email": "taro@example.com"})[1],
-                        name="user_api")
+    def call_step1(ctx: DurableContext):
+        return ctx.step(lambda _: (time.sleep(5), {"id": "1"})[1], name="my_step1")
 
-    def call_orders(ctx: DurableContext):
-        return ctx.step(lambda _: (time.sleep(5), {"order_id": "O001", "items": ["item1"], "total": 1000})[1],
-                        name="orders_api")
+    def call_step2(ctx: DurableContext):
+        return ctx.step(lambda _: (time.sleep(3), {"id": "2"})[1], name="my_step2")
 
-    def call_inventory(ctx: DurableContext):
-        return ctx.step(lambda _: (time.sleep(2), {"product_id": "P001", "stock": 50})[1],
-                        name="inventory_api")
+    def call_step3(ctx: DurableContext):
+        return ctx.step(lambda _: (time.sleep(2), {"id": "3"})[1], name="my_step3")
 
-    batch = context.parallel([call_user, call_orders, call_inventory], name="parallel_demo")
+    batch = context.parallel([call_step1, call_step2, call_step3], name="parallel_demo")
     return {
-        "user": batch.all[0].result,
-        "orders": batch.all[1].result,
-        "inventory": batch.all[2].result,
+        "my_step1": batch.all[0].result,
+        "my_step2": batch.all[1].result,
+        "my_step3": batch.all[2].result,
     }
 ```
+
+![画像](/images/lambda-durable-functions/test_parallel.drawio.png)
 
 ## 5. 【Map】動的なリストを「分散」処理する
 
@@ -181,6 +182,8 @@ def lambda_handler(event: dict, context: DurableContext) -> BatchResult[int]:
     result = context.map(items, square)
     return result
 ```
+
+![画像](/images/lambda-durable-functions/test_map.drawio.png)
 
 ## 6. 【Retry】エラーに強いワークフローを作る
 
@@ -207,42 +210,30 @@ attempt_count = 0
 def my_step(step_context: StepContext, my_arg: int) -> str:
     global attempt_count
     attempt_count += 1
-
-    step_context.logger.info(f"my_step called {attempt_count} times")
-
-    # 1回目は失敗
-    if attempt_count == 1:
+    if attempt_count == 1 or attempt_count == 2:
         raise Exception("Fail on first attempt for retry test")
-        # return f"from my_step: {my_arg}"
-
-    # 2回目も失敗
-    if attempt_count == 2:
-        raise Exception("Fail on first attempt for retry test2")
-
     return f"from my_step: {my_arg}"
 
 def retry_strategy(error, attempt_count: int):
-    """ RetryDecision を返す """
     if attempt_count >= 3:
         return RetryDecision.no_retry()
-
     delay_seconds = min(2 ** attempt_count, 300)
     return RetryDecision.retry(Duration(seconds=delay_seconds))
 
 @durable_execution
 def lambda_handler(event, context: DurableContext) -> dict:
-
     msg: str = context.step(
         my_step(123),
         name='call-api',
         config=StepConfig(retry_strategy=retry_strategy),
     )
-
     return {
         "statusCode": 200,
         "body": msg,
     }
 ```
+
+![画像](/images/lambda-durable-functions/test_map.drawio.png)
 
 ## 7. おわりに
 
