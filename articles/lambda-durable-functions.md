@@ -2,7 +2,7 @@
 title: "AWS Lambda durable functions (Step/Wait/Parallel/Map/Retry)"
 emoji: "🍀"
 type: "tech"
-topics: ["aws", "lambda", "serverless", "tech"]
+topics: ["aws", "lambda", "serverless", "tech", "stepfunctions"]
 published: true
 published_at: 2025-12-22 05:00
 publication_name: "secondselection"
@@ -11,14 +11,14 @@ publication_name: "secondselection"
 ## 1. はじめに
 
 今月リリースされた「AWS Lambda durable functions」（以下、durable functions）を早速使ってみました。
-「15分の実行時間制限が解除された」という点がまず注目されていますが、実際どのような機能なのか、簡易なサンプルコードを作り動作検証を行いましたので、本記事にまとめます。
+私はこの内容を聞いた時「15分の実行時間制限が解除された」点にまず着目したのですが、簡易なサンプルコードを使いながら実際どのような機能なのかを確認しましたので、本記事にまとめます。
 
 :::message
 
 ### 対象読者
 
 * durable functionsの基本を理解したい方
-* Step FunctionsやLambdaのワークフローを改善／見直しを考えている方
+* LambdaやStep Functionsのワークフローの改善／見直しを考えている方
 
 :::
 
@@ -28,11 +28,11 @@ publication_name: "secondselection"
 
 Lambdaは基本的に **「短時間」** で **「ステートレス（状態を持たない）」** な処理を行うために設計されており、15分の実行時間制限がありました。
 
-これまで、長時間実行や複数ステップにまたがる処理を実装するためには、Lambdaを複数利用できる **AWS Step Functions** で実装されていた方も多いのではないでしょうか。
+これまで、長時間実行や複数ステップにまたがる処理を実装するためには、Lambdaを複数利用できるStep Functionsで実装されている方も多いのではないでしょうか。
 
 ### 2-2. durable functionsの主な特徴
 
-今回のリリースの特徴は様々な記事があるので、こちらは簡潔に記載します。
+今回のリリースの特徴は様々な記事ですでに紹介されているので、こちらでは簡潔に記載します。
 
 :::message
 
@@ -92,8 +92,8 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 
 まずは基礎となる`step` と `wait`をまず抑えていきましょう。
 
-* step：Lambda関数の中で実行したい具体的な「仕事の単位」を定義
-* wait：長時間の一時停止とコスト効率
+* step：Lambda関数の中で実行したい具体的な「仕事の単位」を定義する
+* wait：長時間の一時停止とコスト効率化を行う
 
 :::details 📝 waitステート時の料金について。
 
@@ -103,17 +103,19 @@ durable functionsの **Waitステート** を使えば、**待機時間は課金
 :::
 > **【検証内容】**
 >
-> 15分の制限について下記4パターンを実施。
-> 待機時間を挟むことで制限を超えて動作することを確認。
-> 一方で待機時間を挟まない場合、タイムアウトが発生することを確認。
+> **15分の制限**について下記4パターンを実施し確認。
+> **待機時間(wait)を挟むことで15分を超えて動作する**ことを確認。
+> 一方で待機時間を挟まない場合には、タイムアウトが発生することを確認。
 
 | 処理内容                  | 合計時間 | 結果                        |
 | --------------------- | ---- | ------------------------- |
-| 1: Step 2分 → Wait 14分    | 16分  | ✅ 問題なく実行できる               |
-| 2: Step 1分 → Wait 7分 を2セット | 16分  | ✅ 問題なく実行できる  |
-| 3: Step 8分 → Step 8分（連続） | 16分  | ❌ タイムアウト発生（1 Step あたりの制限） |
+| 1: step 2分 → wait 14分    | 16分  | ✅ 問題なく実行できる               |
+| 2: step 1分 → wait 7分 を2セット | 16分  | ✅ 問題なく実行できる  |
+| 3: step 8分 → step 8分（連続） | 16分  | ❌ タイムアウト発生（1 Step あたりの制限） |
 
 * **サンプルコード(Step/Wait編)**
+
+上記処理内容の`2: step 1分 → wait 7分を2セット`のコードです。
 
 ```python
 from aws_durable_execution_sdk_python.config import Duration
@@ -144,7 +146,7 @@ def lambda_handler(event, context) -> dict:
 
 ## 4. 【parallel】複数の処理を「並列」に走らせる
 
-Parallelは「あらかじめ決まった数」の処理を並列化して実行します。
+parallelは「あらかじめ決まった数」の処理を並列化して実行します。
 
 > **【検証内容】**
 >
@@ -181,7 +183,7 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
 
 ## 5. 【map】動的なリストを「分散」処理する
 
-mapは「配列（リスト）のデータ数」に応じて動的に処理を並列化します。
+mapは「リストのデータ数」に応じて動的に処理を並列化します。
 
 > **【検証内容】**
 >
