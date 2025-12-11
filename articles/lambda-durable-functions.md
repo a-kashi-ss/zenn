@@ -10,8 +10,12 @@ publication_name: "secondselection"
 
 ## 1. はじめに
 
-今月リリースされた「**AWS Lambda durable functions**」（以下、durable functions）を早速使ってみました。
+2025年12月リリースされた「**AWS Lambda durable functions**」（以下、durable functions）を早速使ってみました。
 私はこの内容を聞いた時**15分の実行時間制限が解除された**点にまず着目したのですが、簡易なサンプルコードを使いながら実際どのような機能なのかを確認しましたので、本記事にまとめます。
+
+> 【公式ドキュメント】
+> [**AWS Lambda announces durable functions for multi-step applications and AI workflows**](https://aws.amazon.com/jp/about-aws/whats-new/2025/12/lambda-durable-multi-step-applications-ai-workflows/)  Posted on: Dec 2, 2025
+> Lambda durable functions are generally available in US East (Ohio) with support for Python (versions 3.13 and 3.14) and Node.js (versions 22 and 24) runtimes. For the latest region availability, visit the AWS Capabilities by Region [page](https://builder.aws.com/build/capabilities).
 
 :::message
 
