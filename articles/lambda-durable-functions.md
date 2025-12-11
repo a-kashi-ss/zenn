@@ -306,7 +306,7 @@ def lambda_handler(event, context: DurableContext) -> dict:
     }
 ```
 
-![画像](/images/lambda-durable-functions/test_map.drawio.png)
+![画像](/images/lambda-durable-functions/test_retry.drawio.png)
 
 ## 8. おわりに
 
