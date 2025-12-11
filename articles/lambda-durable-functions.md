@@ -11,7 +11,9 @@ publication_name: "secondselection"
 ## 1. はじめに
 
 2025年12月リリースされた「**AWS Lambda durable functions**」（以下、durable functions）を早速使ってみました。
-私はこの内容を聞いた時**15分の実行時間制限が解除された**点にまず着目したのですが、簡易なサンプルコードを使いながら実際どのような機能なのかを確認しましたので、本記事にまとめます。
+本機能は、**Lambda関数内に複数ステップのワークフローを記述しながら、長時間の処理や待機を可能にする耐久実行**を実現する機能です。
+
+この記事では、従来のLambdaの**15分の実行時間制限をどのような条件であれば回避できるか**を、簡易なサンプルコードを交えて実際に確認した内容をまとめます。
 
 > 【公式ドキュメント】
 > [**AWS Lambda announces durable functions for multi-step applications and AI workflows**](https://aws.amazon.com/jp/about-aws/whats-new/2025/12/lambda-durable-multi-step-applications-ai-workflows/)  Posted on: Dec 2, 2025
@@ -36,26 +38,22 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 
 ### 2-2. durable functionsの主な特徴
 
-今回のリリースの特徴は様々な記事ですでに紹介されているので、こちらでは簡潔に記載します。
+1つの関数内で分割された `step` という処理は、各stepが **15 分以内** であれば、従来のLambdaの15分制約を実質的に回避できます。また`wait`で処理を一旦停止したあと再開できます。  
 
 :::message
 
-#### 特徴
+#### おさえておきたいポイント
 
-* **自動チェックポイント + 再開（リプレイ）**
-  * 状態管理やリトライを自動化することで、運用の簡素化を図れます。
-* **最大 1 年の待機**が可能
-  * 長時間のワークフローに対応しています。
-* **待機中はコンピュート料金が発生しない**
-  * 後述する `wait` による待機中には、
-    コンピュート料金が発生しないというメリットがあります。
+* **単一ステップで15分を超える処理はできない**  
+  * ただし複数のstepをチェックポイントとして進めることで実行時間の延長が可能。
+
+* **wait を使うことで処理を中断・再開できる**
+  * `wait` によって待機ポイントを作成し、再開時には直前のチェックポイントから継続。
 
 :::
 
 ### 2-3. 制約・注意点
 
-* 「1回の関数呼び出し」の上限実行時間は通常のLambdaと同様。
-   時間処理は `step` や `wait` を利用して分割する必要あり。
 * サポートランタイムやリージョンが限られている
    ※ 記事執筆時点の情報です
 
@@ -117,12 +115,12 @@ durable functionsの **Waitステート** を使えば、**待機時間は課金
 | 処理内容                  | 合計時間 | 結果                        |
 | --------------------- | ---- | ------------------------- |
 | 1: step 2分 → wait 14分    | 16分  | ✅ 問題なく実行できる               |
-| 2: step 1分 → wait 7分 を2セット | 16分  | ✅ 問題なく実行できる  |
+| 2: step 8分 → wait 1分 を2セット | 18分  | ✅ 問題なく実行できる  |
 | 3: step 8分 → step 8分（連続） | 16分  | ❌ タイムアウト発生（1 Step あたりの制限） |
 
 * **サンプルコード(Step/Wait編)**
 
-上記処理内容の`2: step 1分 → wait 7分を2セット`のコードです。
+上記処理内容の`2: step 8分 → wait 1分を2セット`のコードです。
 
 ```python
 from aws_durable_execution_sdk_python.config import Duration
@@ -133,7 +131,7 @@ import time
 @durable_step
 def my_step(step_context: StepContext, my_arg: int) -> str:
     step_context.logger.info("Hello from my_step")
-    time.sleep(60)
+    time.sleep(480)
     return f"from my_step: {my_arg}"
 
 @durable_execution
@@ -142,7 +140,7 @@ def lambda_handler(event, context) -> dict:
     msg = "" 
     for arg in steps_config:
         msg = context.step(my_step(arg))        
-        context.wait(Duration.from_seconds(420))
+        context.wait(Duration.from_seconds(60))
     return {
         "statusCode": 200,
         "body": msg,
