@@ -13,7 +13,7 @@ publication_name: "secondselection"
 2025年12月リリースされた「**AWS Lambda durable functions**」（以下、durable functions）を早速使ってみました。
 本機能は、**Lambda関数内に複数ステップのワークフローを記述しながら、長時間の処理や待機を可能にする耐久実行**を実現する機能です。
 
-この記事では、従来のLambdaの**15分の実行時間制限をどのような条件であれば回避できるか**を、簡易なサンプルコードを交えて実際に確認した内容をまとめます。
+この記事では、従来のLambdaの**15分の実行時間制限**に対して、新機能はどのような条件であれば回避できるかについて、簡易なサンプルコードを交えて実際に確認した内容をまとめます。
 
 > 【公式ドキュメント】
 > [**AWS Lambda announces durable functions for multi-step applications and AI workflows**](https://aws.amazon.com/jp/about-aws/whats-new/2025/12/lambda-durable-multi-step-applications-ai-workflows/)  Posted on: Dec 2, 2025
