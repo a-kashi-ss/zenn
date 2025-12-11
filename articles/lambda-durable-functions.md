@@ -72,7 +72,7 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 * **map**: リスト要素を「分散」させ、動的にデータを処理
 * **retry**: エラー発生時に自動で再試行
 
-## 3-2. 操作手順の基本
+### 3-2. 操作手順の基本
 
 今回実行した操作の大まかな手順を以下にまとめます。
 
@@ -95,8 +95,7 @@ Lambdaは基本的に **「短時間」** で **「ステートレス（状態�
 
 :::
 
-
-## 3. 【step/wait】サーバーレスで「待つ」を実現する
+## 4. 【step/wait】サーバーレスで「待つ」を実現する
 
 まずは基礎となる`step` と `wait`をまず抑えていきましょう。
 
@@ -152,7 +151,7 @@ def lambda_handler(event, context) -> dict:
 
 ![画像](/images/lambda-durable-functions/test_basic.drawio.png)
 
-## 4. 【parallel】複数の処理を「並列」に走らせる
+## 5. 【parallel】複数の処理を「並列」に走らせる
 
 parallelは「あらかじめ決まった数」の処理を並列化して実行します。
 
@@ -189,7 +188,7 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
 
 ![画像](/images/lambda-durable-functions/test_parallel.drawio.png)
 
-## 5. 【map】動的なリストを「分散」処理する
+## 6. 【map】動的なリストを「分散」処理する
 
 mapは「リストのデータ数」に応じて動的に処理を並列化します。
 
@@ -220,7 +219,7 @@ def lambda_handler(event: dict, context: DurableContext) -> BatchResult[int]:
 
 ※ 注意:上記画像の通りすべて成功と表示されていますが、なぜか詳細ステータスにはfailedと表示されます。同内容でNode.jsで書き直して実行したところ、successとなることは確認しました。
 
-## 6. 【retry】エラーに強いワークフローを作る
+## 7. 【retry】エラーに強いワークフローを作る
 
 エラーが起きたら、少し待ったあとに **自動でリトライ** させることが可能です。
 
@@ -281,14 +280,14 @@ def lambda_handler(event, context: DurableContext) -> dict:
 
 ![画像](/images/lambda-durable-functions/test_map.drawio.png)
 
-## 7. おわりに
+## 8. おわりに
 
 AWS re:Invent 2025において、Step Functionsとの使い分けについて触れられたシーンがありました。今後AIの技術が高度化していくなかでは、**コードベースで定義できる本機能が優位になる可能性がある**と述べられていました。(詳細が気になる方は下記ご確認ください)
 @[card](https://www.youtube.com/watch?v=XJ80NBOwsow)
 
 AIと共存できるようにこのような動向も追いかけながら、IaC含めた技術習得も引き続き進めていきます。
 
-## 8. 参考
+## 9. 参考
 
 @[card](https://zenn.dev/aws_japan/articles/lambda-durable-functions)
 @[card](https://github.com/aws/aws-durable-execution-sdk-python)
