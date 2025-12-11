@@ -10,7 +10,7 @@ publication_name: "secondselection"
 
 ## 1. はじめに
 
-2025年12月リリースされた「**AWS Lambda durable functions**」（以下、durable functions）を早速使ってみました。
+2025年12月にリリースされた「**AWS Lambda durable functions**」（以下、durable functions）を早速使ってみました。
 本機能は、**Lambda関数内に複数ステップのワークフローを記述しながら、長時間の処理や待機を可能にする耐久実行**を実現する機能です。
 
 この記事では、従来のLambdaの**15分の実行時間制限**に対して、新機能はどのような条件であれば回避できるかについて、簡易なサンプルコードを交えて実際に確認した内容をまとめます。
