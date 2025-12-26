@@ -30,6 +30,9 @@ publication_name: "secondselection"
 
 :::
 
+> Step Functionsについてはこちらの記事も参照いただければ幸いです。  
+> @[card](https://zenn.dev/secondselection/articles/begginer-aws-sfn)
+
 ## 2. durable functionsの特徴
 
 ### 2-1. これまでのLambdaの特徴
